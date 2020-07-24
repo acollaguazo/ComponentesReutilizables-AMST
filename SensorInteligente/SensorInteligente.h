@@ -38,6 +38,7 @@ class SensorInteligente
     int _sensorMin;
     int _sensorMax;
     long _tiempoAnterior;
+    
 };
 
 #endif /* SENSORINTELIGENTE_H */

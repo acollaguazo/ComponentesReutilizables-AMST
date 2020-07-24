@@ -52,10 +52,13 @@ void SensorInteligente::calibrarBateria(){
  */
 void SensorInteligente::valoresSensados()
 {
-    voltajeAlfombra = analogRead(_pinA0);
-    voltajeMedido = (((float) voltajeAlfombra) * 5.0) / 1023.0;
-    bateria = analogRead(_pinA1);
-    porcentajeBateria = map(bateria, _sensorMin, _sensorMax, 0, 100);
+    long randomNumberVelostat = random(1,1023);
+    long randomNumberBateria = random(1,1023);
+    //voltajeAlfombra = analogRead(_pinA0);
+    voltajeMedido = (((float) randomNumberVelostat) * 5.0) / 1023.0;
+    //bateria = analogRead(_pinA1);
+    //porcentajeBateria = map(bateria, _sensorMin, _sensorMax, 0, 100);
+    porcentajeBateria = map(randomNumberBateria, 0, 760, 0, 100);
     delay(250);  
 }
 
