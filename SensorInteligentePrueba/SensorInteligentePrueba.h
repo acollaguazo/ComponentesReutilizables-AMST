@@ -14,14 +14,11 @@
 #ifndef SENSORINTELIGENTEPRUEBA_H
 #define SENSORINTELIGENTEPRUEBA_H
 #include "Arduino.h"
-#include <Isigfox.h>
-#include <WISOL.h>
 
 class SensorInteligentePrueba
 {
   public:
     SensorInteligentePrueba();
-    Isigfox *sigfox;
     void inicializar();
     void calibrarBateria();
     void valoresSensados();
@@ -29,7 +26,6 @@ class SensorInteligentePrueba
     float divisorVoltajeVelostat();
     void bateriaMenor(float porcentajeBateria);
     void enviarBateria(long intervalo);
-    void enviarSigfox(int sensor, int bateria);
     float bateria;
     float porcentajeBateria;
     int voltajeAlfombra;

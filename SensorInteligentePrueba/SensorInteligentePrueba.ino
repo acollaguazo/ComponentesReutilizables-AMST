@@ -5,8 +5,8 @@ SensorInteligentePrueba SensorInteligentePrueba;
 void setup() {
   Serial.begin(9600);
   SensorInteligentePrueba.inicializar();
-  /*Serial.println("CALIBRACION: ");
-  SensorInteligentePrueba.calibrarBateria();*/
+  Serial.println("CALIBRACION: ");
+  SensorInteligentePrueba.calibrarBateria();
 }
 
 void loop() {
@@ -17,9 +17,8 @@ void loop() {
   Serial.print("Bateria ");
   Serial.print(SensorInteligentePrueba.porcentajeBateria);
   Serial.println("%");
-  /*Serial.print("voltaje ");
-  Serial.println(SensorInteligentePrueba.voltajeMedido);*/
-  //SensorInteligentePrueba.bateriaMenor(SensorInteligentePrueba.porcentajeBateria);
+  Serial.print("voltaje ");
+  Serial.println(SensorInteligentePrueba.voltajeMedido);
   SensorInteligentePrueba.enviarBateria(600);
   delay(1000);
 }
