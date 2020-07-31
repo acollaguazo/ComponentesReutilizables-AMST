@@ -20,26 +20,26 @@
 class SensorInteligentePrueba
 {
   public:
-    SensorInteligentePrueba(int pinA0, int pinA1);
+    SensorInteligentePrueba();
     Isigfox *sigfox;
     void inicializar();
     void calibrarBateria();
     void valoresSensados();
-    int divisorVoltajeBateria();
-    int divisorVoltajeVelostat();
-    void bateriaMenor(int porcentajeBateria);
+    float divisorVoltajeBateria();
+    float divisorVoltajeVelostat();
+    void bateriaMenor(float porcentajeBateria);
     void enviarBateria(long intervalo);
     void enviarSigfox(int sensor, int bateria);
     float bateria;
-    int porcentajeBateria;
+    float porcentajeBateria;
     int voltajeAlfombra;
-    int voltajeMedido;
-    int bateriaEnviar;
+    float voltajeMedido;
+    float bateriaEnviar;
   private:
     int _pinA0;
     int _pinA1;
-    int _sensorMin;
-    int _sensorMax;
+    float _sensorMin;
+    float _sensorMax;
     long _tiempoAnterior;    
 };
 

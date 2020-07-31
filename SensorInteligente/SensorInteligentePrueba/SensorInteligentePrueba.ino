@@ -1,19 +1,25 @@
 #include "SensorInteligentePrueba.h"
 
-const int pinA0 = A0;
-const int pinA1 = A1;
-
-SensorInteligentePrueba sensorInteligentePrueba(pinA0, pinA1);
+SensorInteligentePrueba SensorInteligentePrueba;
 
 void setup() {
   Serial.begin(9600);
-  sensorInteligentePrueba.inicializar();
+  SensorInteligentePrueba.inicializar();
+  /*Serial.println("CALIBRACION: ");
+  SensorInteligentePrueba.calibrarBateria();*/
 }
 
 void loop() {
-  //sensorInteligente.calibrarBateria();
-  sensorInteligentePrueba.valoresSensados();
-  sensorInteligentePrueba.bateriaMenor(sensorInteligentePrueba.porcentajeBateria);
-  sensorInteligentePrueba.enviarBateria(600000);
-  delay(3000);
+  Serial.println("Prueba");
+  SensorInteligentePrueba.valoresSensados();
+  Serial.print("Voltaje de bateria ");
+  Serial.println(SensorInteligentePrueba.bateria);
+  Serial.print("Bateria ");
+  Serial.print(SensorInteligentePrueba.porcentajeBateria);
+  Serial.println("%");
+  /*Serial.print("voltaje ");
+  Serial.println(SensorInteligentePrueba.voltajeMedido);*/
+  //SensorInteligentePrueba.bateriaMenor(SensorInteligentePrueba.porcentajeBateria);
+  SensorInteligentePrueba.enviarBateria(600);
+  delay(1000);
 }

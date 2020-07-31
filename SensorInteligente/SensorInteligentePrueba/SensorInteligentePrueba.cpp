@@ -13,35 +13,40 @@
 /*
  * Inicializa los puertos para establecer la comunicación serial UART
  */
-SensorInteligentePrueba::SensorInteligentePrueba(int pinA0, int pinA1)
+SensorInteligentePrueba::SensorInteligentePrueba()
 {
-  _pinA0 = pinA0;
-  _pinA1 = pinA1;
+  
 }
 
 void SensorInteligentePrueba::inicializar()
 {
-  _sensorMin = 1023;
-  _sensorMax = 0;
-  _tiempoAnterior = 0;
-  sigfox = new WISOL();
-  sigfox->initSigfox();
-  sigfox->testComms(); 
-  bateriaEnviar = 100;
+  _sensorMin = 5.0;
+  _sensorMax = 0.0;
+  _tiempoAnterior = 0.0;
+  //sigfox = new WISOL();
+  //sigfox->initSigfox();
+  //sigfox->testComms(); 
+  bateriaEnviar = 100.0;
+  porcentajeBateria = 0.0;
+  bateria = 0.0;
+  voltajeMedido =0.0;
 }
 
 /*
  * Realiza una lectura del valor sensado por la batería para poder calibrarla
  */
 void SensorInteligentePrueba::calibrarBateria(){
-  while (millis() < 5000) {
-    bateria = analogRead(_pinA1);
+  while (millis() < 50) {
+    bateria = SensorInteligentePrueba::divisorVoltajeBateria();
     if (bateria > _sensorMax) {
       _sensorMax = bateria;
     }
     if (bateria < _sensorMin) {
       _sensorMin = bateria;
     }
+    Serial.print(_sensorMin);
+    Serial.print(_sensorMax);
+    Serial.println("Calibrado");
   }
 }
 
@@ -53,22 +58,26 @@ void SensorInteligentePrueba::calibrarBateria(){
 void SensorInteligentePrueba::valoresSensados()
 {
     //voltajeAlfombra = analogRead(_pinA0);
-    //voltajeMedido = (((float) randomNumberVelostat) * 5.0) / 1023.0;
-    voltajeMedido = SensorInteligentePrueba::divisorVoltajeVelostat();
+    int randomNumberVelostat = random(0,1023);
+    voltajeMedido = (((float) randomNumberVelostat) * 5.0) / 1023.0;
+    //voltajeMedido = SensorInteligentePrueba::divisorVoltajeVelostat();
     bateria = SensorInteligentePrueba::divisorVoltajeBateria();
-    //porcentajeBateria = map(bateria, _sensorMin, _sensorMax, 0, 100);
-    porcentajeBateria = map(bateria, 0, 716, 0, 100);
-    delay(250);  
+    porcentajeBateria = map(bateria, 0, 7, 0, 100);
+    //SensorInteligentePrueba::bateriaMenor(porcentajeBateria);
+    //porcentajeBateria = map(bateria, 0, 7, 0, 100);
+    //delay(250);  
 }
 
 
 /*
  * Obtiene el nivel de bateria más bajo.
  */
-void SensorInteligentePrueba::bateriaMenor(int porcentajeBateria) 
+void SensorInteligentePrueba::bateriaMenor(float porcentajeBateria) 
 {
-  if ((porcentajeBateria < bateriaEnviar)) {
-    bateriaEnviar = porcentajeBateria;
+  if ((porcentajeBateria <= SensorInteligentePrueba::bateriaEnviar)) {
+      SensorInteligentePrueba::bateriaEnviar = porcentajeBateria;
+  }else{
+    return;
   }
 }
 
@@ -78,26 +87,44 @@ void SensorInteligentePrueba::bateriaMenor(int porcentajeBateria)
  */
 void SensorInteligentePrueba::enviarBateria(long intervalo) 
 {
-  if (millis() - _tiempoAnterior > intervalo) {
-    _tiempoAnterior = millis();
-    Serial.println(bateriaEnviar);
-    SensorInteligentePrueba::enviarSigfox(voltajeAlfombra, (int)porcentajeBateria);
+  SensorInteligentePrueba::bateriaMenor(porcentajeBateria);
+  long tiempoA = millis();  
+  if (tiempoA - _tiempoAnterior > intervalo) {
+    _tiempoAnterior = tiempoA;
+    if(bateriaEnviar > 10){
+    Serial.print(bateriaEnviar);
+    Serial.println(" <- Enviando...");
+    }else{
+    Serial.println("Bateria baja :(");
+    }
+    //SensorInteligentePrueba::enviarSigfox(voltajeAlfombra, (int)porcentajeBateria);
   }
 }
 
 //Devuelve valor del sensor ya convertido, en el rango [0, 5].
-int SensorInteligentePrueba::divisorVoltajeVelostat(){
-  int rBajo = 10000;
-  int rArriba = random(0, 500);
-  return (rBajo/(rBajo+10000))*5;
+float SensorInteligentePrueba::divisorVoltajeVelostat(){
+  float valor =0.0, suma, mult;
+  float rBajo = 10000.0;
+  float rArriba = random(0.0, 500.0);
+  
+  //Serial.print("arriba ");
+  //Serial.println(rArriba);
+  //suma = ;
+  valor = rBajo / (rArriba + rBajo) * 5.0;
+  //valor = mult * 5;
+  //Serial.print("valor ");
+  //Serial.println(valor);
+  return valor;
 }
 
 //Devuelve valor de la batería ya convertido, en el rango [0, 5].
-int SensorInteligentePrueba::divisorVoltajeBateria(){
-  int vIn = random(1, 9);
-  int rBajo = 1000;
-  int rArriba = 1000;
-  return (rBajo/(rBajo+rArriba))*vIn;
+float SensorInteligentePrueba::divisorVoltajeBateria(){
+  float vIn = random(0.9, 9);
+  float rBajo = 1000;
+  float rArriba = 1000;
+  float valor;
+  valor = (rBajo/(rBajo+rArriba))*vIn;
+  return valor;
 }
 
 void SensorInteligentePrueba::enviarSigfox(int sensor, int bateria) {
