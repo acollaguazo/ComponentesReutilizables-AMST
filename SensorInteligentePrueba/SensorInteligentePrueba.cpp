@@ -18,7 +18,7 @@ SensorInteligentePrueba::SensorInteligentePrueba()
 
 void SensorInteligentePrueba::inicializar()
 {
-  _sensorMin = 5.0;
+  _sensorMin = 9.0;
   _sensorMax = 0.0;
   _tiempoAnterior = 0.0; 
   bateriaEnviar = 100.0;
@@ -40,9 +40,8 @@ void SensorInteligentePrueba::calibrarBateria(){
       _sensorMin = bateria;
     }
     Serial.print(_sensorMin);
-    Serial.println(" ");
-    Serial.print(_sensorMax);
-    Serial.println(" Calibrado");
+    Serial.print("  ");
+    Serial.println(_sensorMax);
   }
 }
 
@@ -53,15 +52,11 @@ void SensorInteligentePrueba::calibrarBateria(){
  */
 void SensorInteligentePrueba::valoresSensados()
 {
-    //voltajeAlfombra = analogRead(_pinA0);
     int randomNumberVelostat = random(0,1023);
     voltajeMedido = (((float) randomNumberVelostat) * 5.0) / 1023.0;
     //voltajeMedido = SensorInteligentePrueba::divisorVoltajeVelostat();
     bateria = SensorInteligentePrueba::divisorVoltajeBateria();
     porcentajeBateria = map(bateria, 0, 7, 0, 100);
-    //SensorInteligentePrueba::bateriaMenor(porcentajeBateria);
-    //porcentajeBateria = map(bateria, 0, 7, 0, 100);
-    //delay(250);  
 }
 
 
@@ -82,12 +77,12 @@ void SensorInteligentePrueba::bateriaMenor(float porcentajeBateria)
  */
 void SensorInteligentePrueba::enviarBateria(long intervalo) 
 {
-  SensorInteligentePrueba::bateriaMenor(porcentajeBateria);
+  //SensorInteligentePrueba::bateriaMenor(porcentajeBateria);
   long tiempoA = millis();  
   if (tiempoA - _tiempoAnterior > intervalo) {
     _tiempoAnterior = tiempoA;
-    if(bateriaEnviar > 10){
-      Serial.print(bateriaEnviar);
+    if(porcentajeBateria > 10){
+      Serial.print(porcentajeBateria);
       Serial.println(" <- Enviando...");
     }else{
       Serial.println("Bateria baja :(");
@@ -104,7 +99,7 @@ float SensorInteligentePrueba::divisorVoltajeVelostat(){
   return valor;
 }
 
-//Devuelve valor de la batería ya convertido, en el rango [0, 5].
+//Devuelve valor de la batería ya convertido, en el rango [0, 9].
 float SensorInteligentePrueba::divisorVoltajeBateria(){
   float vIn = random(0.9, 9);
   float rBajo = 1000;

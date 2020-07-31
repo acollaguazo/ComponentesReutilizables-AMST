@@ -32,8 +32,6 @@ class SensorInteligentePrueba
     float voltajeMedido;
     float bateriaEnviar;
   private:
-    int _pinA0;
-    int _pinA1;
     float _sensorMin;
     float _sensorMax;
     long _tiempoAnterior;    
