@@ -14,29 +14,46 @@
 #ifndef SENSORINTELIGENTE_H
 #define SENSORINTELIGENTE_H
 #include "Arduino.h"
-#include <Isigfox.h>
-#include <WISOL.h>
 
 class SensorInteligente
 {
   public:
+    /*
+     * Crea un objeto de tipo SensorInteligente, 
+     * para medir el voltaje del velostat.
+     * 
+     * @param pinA0: pin análogo al que se conecta el velostat
+     */
+    SensorInteligente(int pinA0);
+    /*
+     * Crea un objeto de tipo SensorInteligente, 
+     * para medir los valores de la batería y el velostat.
+     * 
+     * @param pinA0: pin análogo al que se conecta el velostat
+     * @param pinA1: pin análogo al que se conecta la fuente de alimentación
+     */
     SensorInteligente(int pinA0, int pinA1);
-    Isigfox *sigfox;
+
+    
     void inicializar();
     void calibrarBateria();
+    
+    float leerPorcentajeBateria();
+    float leerVoltajeVelostat();
     void valoresSensados();
-    void bateriaMenor(int bateriaActual, int bateriaEnviar);
+    void bateriaMenor(float porcentajeBateria);
     void enviarBateria(long intervalo);
+    void EnviarSigfox();
     float bateria;
-    int porcentajeBateria;
+    float porcentajeBateria;
     int voltajeAlfombra;
-    int voltajeMedido;
-    int bateriaEnviar;
+    float voltajeMedido;
+    float bateriaEnviar;
   private:
     int _pinA0;
     int _pinA1;
-    int _sensorMin;
-    int _sensorMax;
+    float _sensorMin;
+    float _sensorMax;
     long _tiempoAnterior;
     
 };
