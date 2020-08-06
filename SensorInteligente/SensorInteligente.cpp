@@ -25,7 +25,7 @@ SensorInteligente::SensorInteligente(int pinA0, int pinA1)
 {
   _pinA0 = pinA0;
   _pinA1 = pinA1;
-  Serial.begin(9600);
+  //Serial.begin(9600);
 }
 
 void SensorInteligente::inicializar()

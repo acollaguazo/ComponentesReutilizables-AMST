@@ -4,9 +4,10 @@
 #include "SensorInteligente.h"
 
 const int pinA0 = A0;
+const int pinA1 = A1;
 int contador = 0;
 
-SensorInteligente sensores = SensorInteligente(pinA0);
+SensorInteligente sensores = SensorInteligente(pinA0, pinA1);
 Isigfox *Isigfox;
 
 void setup() {
@@ -15,31 +16,31 @@ void setup() {
   Isigfox->testComms();
   Serial.begin(9600);
   sensores.inicializar();
-  /*Serial.println("CALIBRACION: ");
+  Serial.println("CALIBRACION: ");
   sensores.calibrarBateria();
-  Serial.println("Calibrado!");*/
+  Serial.println("Calibrado!");
 }
 
 void loop() {
   Serial.print("PRUEBA ");
   Serial.println(contador++);
-  /*Serial.print("1 Voltaje de bateria = ");
+  Serial.print("1 Voltaje de bateria = ");
   Serial.println(sensores.bateria);
   Serial.print("2 Porcentaje de bateria = ");
   Serial.print(sensores.leerPorcentajeBateria());
-  Serial.println("%");*/
+  Serial.println("%");
   Serial.print("3 Voltaje = ");
   float voltaje = sensores.leerVoltajeVelostat();
   Serial.println(voltaje);
-  /*sensores.enviarBateria(600);*/
+  //sensores.enviarBateria(600);
   Serial.println("");
-  enviarSigfox(voltaje);
+  enviarSigfox(voltaje, sensores.leerPorcentajeBateria());
   delay(1200);
 }
 
-void enviarSigfox(float voltajeMedido) {
+void enviarSigfox(float voltajeMedido, float porcentajeBateria) {
   byte *float_velostat = (byte *)&voltajeMedido;
-  //byte *float_bateria = (byte *)&porcentajeBateria;
+  byte *float_bateria = (byte *)&porcentajeBateria;
 
   const uint8_t payloadSize = 4;
   uint8_t buf_str[payloadSize];
@@ -47,10 +48,10 @@ void enviarSigfox(float voltajeMedido) {
   buf_str[1] = float_velostat[1];
   buf_str[2] = float_velostat[2];
   buf_str[3] = float_velostat[3];
-  /*buf_str[4] = float_bateria[0];
+  buf_str[4] = float_bateria[0];
   buf_str[5] = float_bateria[1];
   buf_str[6] = float_bateria[2];
-  buf_str[7] = float_bateria[3];*/
+  buf_str[7] = float_bateria[3];
 
   uint8_t *sendData = buf_str;
   int len = 4;
