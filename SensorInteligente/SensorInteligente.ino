@@ -1,23 +1,32 @@
-#include <Isigfox.h>
-#include <WISOL.h>
 
 #include "SensorInteligente.h"
+
+#include <Isigfox.h>
+#include <WISOL.h>
 
 const int pinA0 = A0;
 const int pinA1 = A1;
 int contador = 0;
-
-SensorInteligente sensores = SensorInteligente(pinA0, pinA1);
 Isigfox *Isigfox = new WISOL();
+SensorInteligente sensores = SensorInteligente(pinA0, pinA1);
+
+
+typedef union{
+    uint16_t number;
+    uint8_t bytes[2];
+} UINT16_t;
 
 void setup() {
-  Isigfox->initSigfox();
-  Isigfox->testComms();
   Serial.begin(9600);
+  
   sensores.inicializar();
+  
   Serial.println("CALIBRACION: ");
   sensores.calibrarBateria();
   Serial.println("Calibrado!");
+
+  /*Isigfox->initSigfox();
+  Isigfox->testComms();*/
 }
 
 void loop() {

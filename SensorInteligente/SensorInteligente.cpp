@@ -5,8 +5,6 @@
  */
 
 #include "SensorInteligente.h"
-/*#include <Isigfox.h>
-#include <WISOL.h>*/
 #include "Arduino.h"
 
 /** Crea un objeto de tipo SensorInteligente.
@@ -32,17 +30,26 @@ SensorInteligente::SensorInteligente(int pinA0, int pinA1)
 
 void SensorInteligente::inicializar()
 {
+  voltajeBateria = 0.0;
   _sensorMin = 1023;
   _sensorMax = 0;
   _tiempoAnterior = 0.0;
   /*Isigfox = new WISOL();
   Isigfox->initSigfox();
-  Isigfox->testComms();*/
+  Isigfox->testComms();*/ 
   bateriaEnviar = 100.0;
   porcentajeBateria = 0.0;
-  voltajeBateria = 0.0;
   bateria = 0.0;
   voltajeMedido = 0.0;
+}
+
+
+
+float SensorInteligente::leerVoltajeBateria()
+{
+  bateria = analogRead(_pinA1);   
+  voltajeBateria = (((float) bateria) * 5.0) / 1023.0;
+  return voltajeBateria;
 }
 
 /*
@@ -50,7 +57,7 @@ void SensorInteligente::inicializar()
  * para establecer los valores de entrada mínimo y máximos.
  */
 void SensorInteligente::calibrarBateria(){
-  while (millis() < 1000) {
+  while (millis() < 2000) {
     bateria = analogRead(_pinA1);
     if (bateria > _sensorMax) {
       _sensorMax = bateria;
@@ -80,15 +87,10 @@ void SensorInteligente::valoresSensados()
 
 float SensorInteligente::leerPorcentajeBateria()
 {
-    bateria = analogRead(_pinA1);    
-    voltajeBateria = (((float) bateria) * 5.0) / 1023.0;
+    bateria = analogRead(_pinA1);
+    //voltajeBateria = (((float) bateria) * 5.0) / 1023.0;
     porcentajeBateria = map(bateria, 0, _sensorMax, 0, 100);
     return porcentajeBateria;
-}
-
-float SensorInteligente::leerVoltajeBateria()
-{
-  return voltajeBateria;
 }
 
 float SensorInteligente::leerVoltajeVelostat()
@@ -98,9 +100,9 @@ float SensorInteligente::leerVoltajeVelostat()
     Serial.print(voltajeMedido);
     if(voltajeMedido < 1.0){
       Serial.println(" - Sin presionar");
-    }else if(voltajeMedido < 2.0){
+    }else if(voltajeMedido < 3.0){
       Serial.println(" - Presionando ligeramente");
-    }else if (voltajeMedido < 3.0){ 
+    }else if (voltajeMedido < 4.0){ 
       Serial.println(" - Presionando medianamemente");
     }else{
       Serial.println(" - Presionando fuertemente");
@@ -137,31 +139,3 @@ void SensorInteligente::enviarBateria(long intervalo)
     }
   }
 }
-
-/*void enviarSigfox(float voltajeMedido, float porcentajeBateria) {
-  byte *float_velostat = (byte *)&voltajeMedido;
-  byte *float_bateria = (byte *)&porcentajeBateria;
-
-  const uint8_t payloadSize = 4;
-  uint8_t buf_str[payloadSize];
-  buf_str[0] = float_velostat[0];
-  buf_str[1] = float_velostat[1];
-  buf_str[2] = float_velostat[2];
-  buf_str[3] = float_velostat[3];
-  buf_str[4] = float_bateria[0];
-  buf_str[5] = float_bateria[1];
-  buf_str[6] = float_bateria[2];
-  buf_str[7] = float_bateria[3];
-
-  uint8_t *sendData = buf_str;
-  int len = 4;
-  recvMsg *RecvMsg;
-  RecvMsg = (recvMsg *)malloc(sizeof(recvMsg));
-  
-  //Isigfox->sendPayload(sendData, len, 0, RecvMsg);
-  for (int i = 0; i < RecvMsg->len; i++) {
-    Serial.print(RecvMsg->inData[i]);
-  }
-  Serial.println("");
-  free(RecvMsg);
-}*/

@@ -13,23 +13,11 @@
 
 #ifndef SENSORINTELIGENTE_H
 #define SENSORINTELIGENTE_H
-/*#include "Arduino.h"
-#include <Isigfox.h>*/
-#include <WISOL.h>
+#include "Arduino.h"
 
 class SensorInteligente
 {
   public:
-    /*typedef struct _recvMsg{
-      int len;
-      char* inData;
-    } recvMsg;
-    Isigfox *Isigfox;
-    typedef union{
-    uint16_t number;
-    uint8_t bytes[2];
-} UINT16_t;*/
-
     /*
      * Crea un objeto de tipo SensorInteligente, 
      * para medir el voltaje del velostat.
@@ -44,10 +32,13 @@ class SensorInteligente
      * @param pinA0: pin análogo al que se conecta el velostat
      * @param pinA1: pin análogo al que se conecta la fuente de alimentación
      */
-    SensorInteligente(int pinA0, int pinA1);   
+    SensorInteligente(int pinA0, int pinA1);
+
+    
     void inicializar();
     void calibrarBateria();
     float leerVoltajeBateria();
+    float voltajeBateria;
     float leerPorcentajeBateria();
     float leerVoltajeVelostat();
     void valoresSensados();
@@ -58,7 +49,6 @@ class SensorInteligente
     float porcentajeBateria;
     int voltajeAlfombra;
     float voltajeMedido;
-    float voltajeBateria;
     float bateriaEnviar;
   private:
     int _pinA0;
