@@ -8,10 +8,9 @@ const int pinA1 = A1;
 int contador = 0;
 
 SensorInteligente sensores = SensorInteligente(pinA0, pinA1);
-Isigfox *Isigfox;
+Isigfox *Isigfox = new WISOL();
 
 void setup() {
-  Isigfox = new WISOL();
   Isigfox->initSigfox();
   Isigfox->testComms();
   Serial.begin(9600);
@@ -25,7 +24,7 @@ void loop() {
   Serial.print("PRUEBA ");
   Serial.println(contador++);
   Serial.print("1 Voltaje de bateria = ");
-  Serial.println(sensores.bateria);
+  Serial.println(sensores.leerVoltajeBateria());
   Serial.print("2 Porcentaje de bateria = ");
   Serial.print(sensores.leerPorcentajeBateria());
   Serial.println("%");
