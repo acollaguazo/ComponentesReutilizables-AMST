@@ -41,6 +41,7 @@ void SensorInteligente::inicializar()
   porcentajeBateria = 0.0;
   bateria = 0.0;
   voltajeMedido = 0.0;
+  
 }
 
 
@@ -57,7 +58,7 @@ float SensorInteligente::leerVoltajeBateria()
  * para establecer los valores de entrada mínimo y máximos.
  */
 void SensorInteligente::calibrarBateria(){
-  while (millis() < 2000) {
+  /*while (millis() < 2000) {
     bateria = analogRead(_pinA1);
     if (bateria > _sensorMax) {
       _sensorMax = bateria;
@@ -68,7 +69,13 @@ void SensorInteligente::calibrarBateria(){
     Serial.print(_sensorMin);
     Serial.print("  ");
     Serial.println(_sensorMax);
-  }
+  }*/
+
+  float rbajo = 1000.0;
+  float rarriba = 10000.0;
+  float vin = 9;
+  float vMax = (rbajo/(rbajo+rarriba))*vin;
+  _sensorMax = vMax*(1023/5);
 }
 
 /*
@@ -87,6 +94,7 @@ void SensorInteligente::valoresSensados()
 
 float SensorInteligente::leerPorcentajeBateria()
 {
+    SensorInteligente::calibrarBateria();
     bateria = analogRead(_pinA1);
     //voltajeBateria = (((float) bateria) * 5.0) / 1023.0;
     porcentajeBateria = map(bateria, 0, _sensorMax, 0, 100);
