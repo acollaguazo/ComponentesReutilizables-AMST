@@ -12,7 +12,8 @@ SensorInteligente sensores = SensorInteligente(pinA0, pinA1);
 
 void setup() {
   Serial.begin(9600);
-  sensores.inicializar();
+  sensores.inicializar();  
+  sensores.calibrarBateria(1000, 10000, 9);
   Isigfox->initSigfox();
   Isigfox->testComms();
   Isigfox->getZone();
@@ -21,7 +22,6 @@ void setup() {
 void loop() {
   Isigfox->getZone();
   Serial.print("PRUEBA ");
-  sensores.calibrarBateria(1000, 10000, 9);
   Serial.println(contador++);
   Serial.print("1 Voltaje de bateria = ");
   float bateria = sensores.leerPorcentajeBateria();
