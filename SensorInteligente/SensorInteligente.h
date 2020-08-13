@@ -22,7 +22,7 @@ class SensorInteligente
      * Crea un objeto de tipo SensorInteligente, 
      * para medir el voltaje del velostat.
      * 
-     * @param pinA0: pin análogo al que se conecta el velostat
+     * @param pinA0: pin análogo al que se conecta la bateria
      */
     SensorInteligente(int pinA0);
     /*
@@ -36,15 +36,13 @@ class SensorInteligente
 
     
     void inicializar();
-    void calibrarBateria();
+    void calibrarBateria(int rBajo, int rArriba, int vIn);
     float leerVoltajeBateria();
     float voltajeBateria;
     float leerPorcentajeBateria();
     float leerVoltajeVelostat();
-    void valoresSensados();
     void bateriaMenor(float porcentajeBateria);
     void enviarBateria(long intervalo);
-    void EnviarSigfox();
     float bateria;
     float porcentajeBateria;
     int voltajeAlfombra;
@@ -53,7 +51,6 @@ class SensorInteligente
   private:
     int _pinA0;
     int _pinA1;
-    float _sensorMin;
     float _sensorMax;
     long _tiempoAnterior;
     

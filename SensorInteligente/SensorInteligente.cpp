@@ -25,26 +25,18 @@ SensorInteligente::SensorInteligente(int pinA0, int pinA1)
 {
   _pinA0 = pinA0;
   _pinA1 = pinA1;
-  //Serial.begin(9600);
 }
 
 void SensorInteligente::inicializar()
 {
   voltajeBateria = 0.0;
-  _sensorMin = 1023;
   _sensorMax = 0;
   _tiempoAnterior = 0.0;
-  /*Isigfox = new WISOL();
-  Isigfox->initSigfox();
-  Isigfox->testComms();*/ 
   bateriaEnviar = 100.0;
   porcentajeBateria = 0.0;
   bateria = 0.0;
   voltajeMedido = 0.0;
-  
 }
-
-
 
 float SensorInteligente::leerVoltajeBateria()
 {
@@ -57,25 +49,14 @@ float SensorInteligente::leerVoltajeBateria()
  * Realiza la lectura del voltaje de la batería durante los primeros 2 segundos 
  * para establecer los valores de entrada mínimo y máximos.
  */
-void SensorInteligente::calibrarBateria(){
-  /*while (millis() < 2000) {
-    bateria = analogRead(_pinA1);
-    if (bateria > _sensorMax) {
-      _sensorMax = bateria;
-    }
-    if (bateria < _sensorMin) {
-      _sensorMin = bateria;
-    }
-    Serial.print(_sensorMin);
-    Serial.print("  ");
-    Serial.println(_sensorMax);
-  }*/
-
-  float rbajo = 1000.0;
-  float rarriba = 10000.0;
-  float vin = 9;
-  float vMax = (rbajo/(rbajo+rarriba))*vin;
+void SensorInteligente::calibrarBateria(int rBajo, int rArriba, int vIn){
+  rBajo = 1000;
+  rArriba = 10000;
+  vIn = 9;
+  float vMax = (rBajo/(rBajo+rArriba))*vIn;
   _sensorMax = vMax*(1023/5);
+  Serial.print("calibrado - Vout = ");
+  Serial.println(vMax);
 }
 
 /*
@@ -83,20 +64,9 @@ void SensorInteligente::calibrarBateria(){
  * Se convierte el valor de la entrada analógica para el voltaje y,
  * se calibra el nivel de la batería para que esté en el rango 0 - 100.
  */
-void SensorInteligente::valoresSensados()
-{
-    voltajeAlfombra = analogRead(_pinA0);
-    voltajeMedido = (((float) voltajeAlfombra) * 5.0) / 1023.0;
-    bateria = analogRead(_pinA1);
-    porcentajeBateria = map(bateria, _sensorMin, _sensorMax, 0, 100);
-    delay(250);  
-}
-
 float SensorInteligente::leerPorcentajeBateria()
 {
-    SensorInteligente::calibrarBateria();
     bateria = analogRead(_pinA1);
-    //voltajeBateria = (((float) bateria) * 5.0) / 1023.0;
     porcentajeBateria = map(bateria, 0, _sensorMax, 0, 100);
     return porcentajeBateria;
 }
