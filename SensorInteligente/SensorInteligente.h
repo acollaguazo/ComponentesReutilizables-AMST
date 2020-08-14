@@ -36,7 +36,7 @@ class SensorInteligente
 
     
     void inicializar();
-    void calibrarBateria(int rBajo, int rArriba, int vIn);
+    void calibrarBateria(float rBajo, float rArriba, float vIn);
     float leerVoltajeBateria();
     float voltajeBateria;
     float leerPorcentajeBateria();

@@ -49,7 +49,7 @@ float SensorInteligente::leerVoltajeBateria()
  * Realiza la lectura del voltaje de la batería durante los primeros 2 segundos 
  * para establecer los valores de entrada mínimo y máximos.
  */
-void SensorInteligente::calibrarBateria(int rBajo, int rArriba, int vIn){
+void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
   rBajo = 1000;
   rArriba = 10000;
   vIn = 9;
@@ -66,6 +66,7 @@ void SensorInteligente::calibrarBateria(int rBajo, int rArriba, int vIn){
  */
 float SensorInteligente::leerPorcentajeBateria()
 {
+    //SensorInteligente::calibrarBateria(1000, 10000, 9);
     bateria = analogRead(_pinA1);
     porcentajeBateria = map(bateria, 0, _sensorMax, 0, 100);
     return porcentajeBateria;

@@ -1,4 +1,3 @@
-
 #include "SensorInteligente.h"
 #include <Isigfox.h>
 #include <WISOL.h>
@@ -13,14 +12,15 @@ SensorInteligente sensores = SensorInteligente(pinA0, pinA1);
 void setup() {
   Serial.begin(9600);
   sensores.inicializar();  
-  sensores.calibrarBateria(1000, 10000, 9);
+ 
   Isigfox->initSigfox();
   Isigfox->testComms();
   Isigfox->getZone();
 }
 
 void loop() {
-  Isigfox->getZone();
+  sensores.calibrarBateria(1000, 10000, 9);
+  //Isigfox->getZone();
   Serial.print("PRUEBA ");
   Serial.println(contador++);
   Serial.print("1 Voltaje de bateria = ");
@@ -49,7 +49,7 @@ void enviarSigfox(float voltajeMedido, int porcentajeBateria) {
   buf_str[2] = float_velostat[2];
   buf_str[3] = float_velostat[3];
   buf_str[4] = float_bateria[0];
-  buf_str[5] = float_bateria[1];
+  //buf_str[5] = float_bateria[1];
   //buf_str[6] = float_bateria[2];
   //buf_str[7] = float_bateria[3];
 
