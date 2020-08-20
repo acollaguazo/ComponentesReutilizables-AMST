@@ -12,10 +12,12 @@
  * 
  * @param pinA0: pin análogo al que se conecta el velostat.
  */
-SensorInteligente::SensorInteligente(int pinA0)
+SensorInteligente::SensorInteligente(int pinA0, int r1, int r2, int vin)
 {
   _pinA0 = pinA0;
-  Serial.begin(9600);
+  _r1 = r1;
+  _r2 = r2; 
+  _vin = vin;
 }
 
 /*
@@ -66,7 +68,7 @@ void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
  */
 float SensorInteligente::leerPorcentajeBateria()
 {
-    //SensorInteligente::calibrarBateria(1000, 10000, 9);
+    SensorInteligente::calibrarBateria(_r1, _r2, _vin);
     bateria = analogRead(_pinA1);
     porcentajeBateria = map(bateria, 0, _sensorMax, 0, 100);
     return porcentajeBateria;
@@ -88,6 +90,7 @@ float SensorInteligente::leerVoltajeVelostat()
     }
     return voltajeMedido;
 }
+
 /*
  * Obtiene el nivel de bateria más bajo.
  * @params porcentajeBateria
@@ -107,14 +110,24 @@ void SensorInteligente::bateriaMenor(float porcentajeBateria)
  */
 void SensorInteligente::enviarBateria(long intervalo) 
 {
+  SensorInteligente::bateriaMenor(porcentajeBateria);
   long tiempoA = millis();  
   if (tiempoA - _tiempoAnterior > intervalo) {
     _tiempoAnterior = tiempoA;
-    if(porcentajeBateria > 10){
-      Serial.print(porcentajeBateria);
+    if(bateriaEnviar > 20){
+      Serial.print(bateriaEnviar);
+      SensorInteligente::enviarPorcentajeBateria(bateriaEnviar);
       Serial.println(" <- Enviando...");
     }else{
       Serial.println("Bateria baja :(");
     }
   }
+}
+
+void SensorInteligente::enviarPorcentajeBateria(int bateria){
+  Serial.println("AT$RC");
+  Serial.print("AT$SF=");
+  //That's correct, but I should use int value
+  if (bateria < 16)Serial.print("0");
+  Serial.println(bateria, HEX);
 }
