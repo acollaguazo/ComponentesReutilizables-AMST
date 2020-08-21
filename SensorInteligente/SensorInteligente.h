@@ -24,7 +24,7 @@ class SensorInteligente
      * 
      * @param pinA0: pin análogo al que se conecta la bateria
      */
-    SensorInteligente(int pinA0, int r1, int r2, int vin);
+    SensorInteligente(int pinA0, float r1, float r2, float vin);
     /*
      * Crea un objeto de tipo SensorInteligente, 
      * para medir los valores de la batería y el velostat.

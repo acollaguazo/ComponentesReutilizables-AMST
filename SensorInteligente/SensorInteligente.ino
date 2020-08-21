@@ -20,7 +20,7 @@ void setup() {
 }
 
 void loop() {
-  sensores.calibrarBateria(1000, 10000, 9);
+  sensores.calibrarBateria(1000.0, 10000.0, 9.0);
   //Isigfox->getZone();
   Serial.print("PRUEBA ");
   Serial.println(contador++);
@@ -35,7 +35,7 @@ void loop() {
   Serial.println(voltaje);
   //sensores.enviarBateria(600);
   Serial.println("");
-  enviarSigfox(voltaje, (int)bateria);
+  enviar(voltaje, (int)bateria);
   delay(1200);
 }
 
@@ -71,18 +71,20 @@ void enviar(float sensor, int bateria){
   
 void enviarSigfox(float voltajeMedido, int porcentajeBateria) {
   byte *float_velostat = (byte *)&voltajeMedido;
-  //byte *float_bateria = (byte *)&porcentajeBateria;
-  uint8_t porcentaje = (uint8_t)porcentajeBateria;
-  const uint8_t payloadSize = 5;
+  byte *float_bateria = (byte *)&porcentajeBateria;
+  //uint8_t porcentaje = (uint8_t)porcentajeBateria;
+  const uint8_t payloadSize = 8;
   uint8_t buf_str[payloadSize];
   buf_str[0] = float_velostat[0];
   buf_str[1] = float_velostat[1];
   buf_str[2] = float_velostat[2];
   buf_str[3] = float_velostat[3];
-  buf_str[4] = porcentaje;
+  buf_str[4] = float_bateria[0];
+  buf_str[5] = float_bateria[1];
+  
 
   uint8_t *sendData = buf_str;
-  int len = 5;
+  int len = 8;
   recvMsg *RecvMsg;
   RecvMsg = (recvMsg *)malloc(sizeof(recvMsg));
   Isigfox->sendPayload(sendData, len, 0, RecvMsg);

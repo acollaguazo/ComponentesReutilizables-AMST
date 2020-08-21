@@ -12,9 +12,9 @@
  * 
  * @param pinA0: pin análogo al que se conecta el velostat.
  */
-SensorInteligente::SensorInteligente(int pinA0, int r1, int r2, int vin)
+SensorInteligente::SensorInteligente(int pinA0, float r1, float r2, float vin)
 {
-  _pinA0 = pinA0;
+  _pinA1 = pinA0;
   _r1 = r1;
   _r2 = r2; 
   _vin = vin;
@@ -52,9 +52,10 @@ float SensorInteligente::leerVoltajeBateria()
  * para establecer los valores de entrada mínimo y máximos.
  */
 void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
-  rBajo = 1000;
-  rArriba = 10000;
-  vIn = 9;
+  
+  //rBajo = 1000;
+  //rArriba = 10000;
+  //vIn = 9;
   float vMax = (rBajo/(rBajo+rArriba))*vIn;
   _sensorMax = vMax*(1023/5);
   Serial.print("calibrado - Vout = ");
@@ -68,7 +69,7 @@ void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
  */
 float SensorInteligente::leerPorcentajeBateria()
 {
-    SensorInteligente::calibrarBateria(_r1, _r2, _vin);
+    //SensorInteligente::calibrarBateria(_r1, _r2, _vin);
     bateria = analogRead(_pinA1);
     porcentajeBateria = map(bateria, 0, _sensorMax, 0, 100);
     return porcentajeBateria;
@@ -110,24 +111,29 @@ void SensorInteligente::bateriaMenor(float porcentajeBateria)
  */
 void SensorInteligente::enviarBateria(long intervalo) 
 {
-  SensorInteligente::bateriaMenor(porcentajeBateria);
+  //SensorInteligente::bateriaMenor(porcentajeBateria);
   long tiempoA = millis();  
   if (tiempoA - _tiempoAnterior > intervalo) {
     _tiempoAnterior = tiempoA;
-    if(bateriaEnviar > 20){
-      Serial.print(bateriaEnviar);
-      SensorInteligente::enviarPorcentajeBateria(bateriaEnviar);
+    if(porcentajeBateria > 20){
+      //Serial.print(porcentajeBateria);
+      SensorInteligente::enviarPorcentajeBateria((int)porcentajeBateria);
       Serial.println(" <- Enviando...");
     }else{
       Serial.println("Bateria baja :(");
-    }
+   }
   }
 }
 
 void SensorInteligente::enviarPorcentajeBateria(int bateria){
+  //delay(100);
   Serial.println("AT$RC");
+  delay(500);
   Serial.print("AT$SF=");
+  
   //That's correct, but I should use int value
   if (bateria < 16)Serial.print("0");
   Serial.println(bateria, HEX);
+  //delay(1000);
+  
 }
