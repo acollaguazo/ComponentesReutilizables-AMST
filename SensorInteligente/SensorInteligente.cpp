@@ -112,16 +112,17 @@ void SensorInteligente::bateriaMenor(float porcentajeBateria)
 void SensorInteligente::enviarBateria(long intervalo) 
 {
   //SensorInteligente::bateriaMenor(porcentajeBateria);
-  long tiempoA = millis();  
+  /*long tiempoA = millis();  
   if (tiempoA - _tiempoAnterior > intervalo) {
-    _tiempoAnterior = tiempoA;
+    _tiempoAnterior = tiempoA;*/
     if(porcentajeBateria > 20){
       //Serial.print(porcentajeBateria);
       SensorInteligente::enviarPorcentajeBateria((int)porcentajeBateria);
+      delay(intervalo);
       Serial.println(" <- Enviando...");
     }else{
       Serial.println("Bateria baja :(");
-   }
+   //}
   }
 }
 

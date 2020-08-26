@@ -82,7 +82,6 @@ void enviarSigfox(float voltajeMedido, int porcentajeBateria) {
   buf_str[4] = float_bateria[0];
   buf_str[5] = float_bateria[1];
   
-
   uint8_t *sendData = buf_str;
   int len = 8;
   recvMsg *RecvMsg;
