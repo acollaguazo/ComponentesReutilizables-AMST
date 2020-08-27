@@ -41,6 +41,7 @@ class SensorInteligente
     float voltajeBateria;
     float leerPorcentajeBateria();
     float leerVoltajeVelostat();
+    int leerVoltajeVelostatAnalogico();
     void bateriaMenor(float porcentajeBateria);
     void enviarBateria(long intervalo);    
     void enviarPorcentajeBateria(int porcentaje);
