@@ -1,4 +1,4 @@
-#include "SensorInteligente.h"
+/*#include "SensorInteligente.h"
 #include <Isigfox.h>
 #include <WISOL.h>
 
@@ -35,7 +35,7 @@ void loop() {
   Serial.println(voltaje);
   //sensores.enviarBateria(600);
   Serial.println("");
-  enviar(voltaje, (int)bateria);
+  enviarSigfox(voltaje, bateria);
   delay(1200);
 }
 
@@ -59,7 +59,7 @@ void enviarBateria(int bateria){
   Serial.println(bateria,HEX);
 }
 
-void enviarSigfox(float voltajeMedido, int porcentajeBateria) {
+void enviarSigfox(float voltajeMedido, float porcentajeBateria) {
   byte *float_velostat = (byte *)&voltajeMedido;
   byte *float_bateria = (byte *)&porcentajeBateria;
   const uint8_t payloadSize = 9;
@@ -84,3 +84,4 @@ void enviarSigfox(float voltajeMedido, int porcentajeBateria) {
   Serial.println("");
   free(RecvMsg);
 }
+*/

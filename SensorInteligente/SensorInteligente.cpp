@@ -96,12 +96,11 @@ float SensorInteligente::leerVoltajeVelostat()
  * Obtiene el nivel de bateria más bajo.
  * @params porcentajeBateria
  */
-void SensorInteligente::bateriaMenor(float porcentajeBateria) 
+float SensorInteligente::bateriaMenor(float porcentajeBateria) 
 {
   if ((porcentajeBateria < bateriaEnviar)) {
     bateriaEnviar = porcentajeBateria;
-  }else{
-    return;
+    return bateriaEnviar;
   }
 }
 
@@ -109,20 +108,33 @@ void SensorInteligente::bateriaMenor(float porcentajeBateria)
 /*
  * Función que envía el nivel de la batería a Sigfox en el intervalo asignado
  */
-void SensorInteligente::enviarBateria(long intervalo) 
+void SensorInteligente::enviarBateria(long intervalo,float porcentaje) 
 {
-  SensorInteligente::bateriaMenor(porcentajeBateria);
-  Serial.print("Bateria enviar: ");
-  Serial.print(bateriaEnviar);
-  Serial.print("Porcentaje bateria: ");
-  Serial.print(porcentajeBateria);
-  if(porcentajeBateria > 20){
-    SensorInteligente::enviarPorcentajeBateria((int)porcentajeBateria);
-    delay(intervalo-500);
-    Serial.println(" <- Enviando...");
+  int bateria = (int)SensorInteligente::bateriaMenor(porcentaje);
+  
+  
+  if((int)bateria > 20){
+    //SensorInteligente::enviarPorcentajeBateria((int)bateriaEnviar);
+
+    Serial.println("AT$RC");
+    delay(500);
+    Serial.print("AT$SF=");
+    
+    //That's correct, but I should use int value
+    if ((int)bateria < 16)Serial.print("0");
+      Serial.println((int)bateria, HEX);
+      //delay(1000);
+    
+      delay(intervalo-500);
+      //Serial.println(" <- Enviando...");
   }else{
     Serial.println("Bateria baja :(");
   }
+
+  Serial.print("Bateria enviar: ");
+  Serial.print(bateria);
+  Serial.print("Porcentaje bateria: ");
+  Serial.print(porcentaje);
 }
 
 void SensorInteligente::enviarPorcentajeBateria(int bateria){
@@ -135,5 +147,6 @@ void SensorInteligente::enviarPorcentajeBateria(int bateria){
   if (bateria < 16)Serial.print("0");
   Serial.println(bateria, HEX);
   //delay(1000);
+  delay(500);
   
 }
