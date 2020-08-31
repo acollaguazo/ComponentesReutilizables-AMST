@@ -7,12 +7,11 @@ SensorInteligente medicionBateria = SensorInteligente(pinA1, 1000.0, 10000.0, 9.
 
 void setup() {
   Serial.begin(9600);
-  medicionBateria.inicializar();
+  medicionBateria.inicializar();  
+  medicionBateria.calibrarBateria(1000.0, 10000.0, 9.0);
 }
 
 void loop() {
-  
-  medicionBateria.calibrarBateria(1000.0, 10000.0, 9.0);
   Serial.print("PRUEBA ");
   Serial.println(contador++);
   Serial.print("1 Voltaje de bateria = ");
@@ -28,7 +27,7 @@ void loop() {
   //enviarPorcentajeBateria((int)bateria);
 }
 
-
+ 
 void enviarPorcentajeBateria(int bateria){
   //Serial.println("AT$RC");
   Serial.print("AT$SF=");

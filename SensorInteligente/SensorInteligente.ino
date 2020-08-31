@@ -14,23 +14,23 @@ void setup() {
   Serial.begin(9600);
   sensores.inicializar();  
  
+  sensores.calibrarBateria(1000.0, 10000.0, 9.0);
   Isigfox->initSigfox();
   Isigfox->testComms();
   Isigfox->getZone();
 }
 
 void loop() {
-  sensores.calibrarBateria(1000.0, 10000.0, 9.0);
   //Isigfox->getZone();
   Serial.print("PRUEBA ");
   Serial.println(contador++);
-  Serial.print("1 Voltaje de bateria = ");
+  dekay(5);
+  Serial.print("1 Porcentaje de bateria = ");
   float bateria = sensores.leerPorcentajeBateria();
-  Serial.println(sensores.leerVoltajeBateria());
-  Serial.print("2 Porcentaje de bateria = ");
+  delay(5);
   Serial.print(bateria);
   Serial.println("%");
-  Serial.print("3 Voltaje = ");
+  Serial.print("2 Voltaje = ");
   float voltaje = sensores.leerVoltajeVelostat();
   Serial.println(voltaje);
   //sensores.enviarBateria(600);
