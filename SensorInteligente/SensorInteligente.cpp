@@ -57,9 +57,9 @@ void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
   //rArriba = 10000;
   //vIn = 9;
   float vMax = (rBajo/(rBajo+rArriba))*vIn;
-  _sensorMax = (int)vMax*(1023/5);
+   _sensorMax = (int)(vMax*(1023/5));
   Serial.print("calibrado - Vout = ");
-  Serial.println(vMax);
+  Serial.println(_sensorMax);
 }
 
 /*
@@ -67,14 +67,7 @@ void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
  * Se convierte el valor de la entrada analógica para el voltaje y,
  * se calibra el nivel de la batería para que esté en el rango 0 - 100.
  */
-float SensorInteligente::leerPorcentajeBateria()
-{
-    analogRead(_pinA1);
-    delay(5);
-    porcentajeBateria = map(analogRead(_pinA1), 0, _sensorMax, 0, 100);
-    
-    return porcentajeBateria;
-}
+
 
 float SensorInteligente::leerVoltajeVelostat()
 {
@@ -114,16 +107,10 @@ void SensorInteligente::enviarBateria(long intervalo,float porcentaje)
   int bateria = (int)SensorInteligente::bateriaMenor(porcentaje);
   
   
-  if((int)bateria > 20){
-    //SensorInteligente::enviarPorcentajeBateria((int)bateriaEnviar);
+  if((int)bateria > 67){
+    SensorInteligente::enviarPorcentajeBateria((int)bateriaEnviar);
 
-    Serial.println("AT$RC");
-    delay(500);
-    Serial.print("AT$SF=");
     
-    //That's correct, but I should use int value
-    if ((int)bateria < 16)Serial.print("0");
-      Serial.println((int)bateria, HEX);
       //delay(1000);
     
       delay(intervalo-500);
@@ -139,15 +126,24 @@ void SensorInteligente::enviarBateria(long intervalo,float porcentaje)
 }
 
 void SensorInteligente::enviarPorcentajeBateria(int bateria){
-  //delay(100);
-  Serial.println("AT$RC");
-  delay(500);
-  Serial.print("AT$SF=");
+    Serial.println("AT$RC");
+    delay(500);
+    Serial.print("AT$SF=");
+    
+    //That's correct, but I should use int value
+    if ((int)bateria < 16)Serial.print("0");
+      Serial.println((int)bateria, HEX);
+
   
-  //That's correct, but I should use int value
-  if (bateria < 16)Serial.print("0");
-  Serial.println(bateria, HEX);
-  //delay(1000);
-  delay(500);
   
 }
+
+
+float SensorInteligente::leerPorcentajeBateria(){  
+  //Serial.print(_sensorMax);  
+  bateria = analogRead(_pinA1);    
+  delay(5);    
+  porcentajeBateria = map(bateria, 0, _sensorMax, 0, 100);        
+  return porcentajeBateria;
+  
+  }

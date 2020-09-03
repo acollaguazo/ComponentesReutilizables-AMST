@@ -11,10 +11,11 @@ SensorInteligente medicionBateria = SensorInteligente(pinA0, 1000, 10000, 9);
 SensorInteligente sensores = SensorInteligente(pinA0, pinA1);
 
 void setup() {
-  Serial.begin(9600);
+
   sensores.inicializar();  
- 
   sensores.calibrarBateria(1000.0, 10000.0, 9.0);
+  
+  Serial.begin(9600);
   Isigfox->initSigfox();
   Isigfox->testComms();
   Isigfox->getZone();
@@ -24,7 +25,7 @@ void loop() {
   //Isigfox->getZone();
   Serial.print("PRUEBA ");
   Serial.println(contador++);
-  dekay(5);
+
   Serial.print("1 Porcentaje de bateria = ");
   float bateria = sensores.leerPorcentajeBateria();
   delay(5);

@@ -25,6 +25,8 @@ void loop() {
   medicionBateria.enviarBateria(10000, bateria);
   Serial.println(bateria);
   //enviarPorcentajeBateria((int)bateria);
+
+  delay(5000);
 }
 
  
