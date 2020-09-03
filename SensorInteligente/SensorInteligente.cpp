@@ -76,15 +76,19 @@ float SensorInteligente::leerVoltajeVelostat()
  * Obtiene el nivel de bateria más bajo.
  * @params porcentajeBateria
  */
-float SensorInteligente::bateriaMenor(float porcentaje) 
+float SensorInteligente::bateriaMenor(float porcentajeBateria) 
 {
-  if (bateriaEnviar==100) {  
+  /*if (bateriaEnviar==100) {  
     bateriaEnviar = porcentaje; 
   }
   if ((porcentaje > bateriaEnviar-5)) {  
     bateriaEnviar = porcentaje; 
   }
-  return bateriaEnviar;
+  return bateriaEnviar;*/
+  if ((porcentajeBateria < bateriaEnviar)) {
+    bateriaEnviar = porcentajeBateria;
+    return bateriaEnviar;
+  }
 }
 
 
