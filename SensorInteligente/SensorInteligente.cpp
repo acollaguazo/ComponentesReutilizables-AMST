@@ -52,12 +52,9 @@ float SensorInteligente::leerVoltajeBateria()
  * para establecer los valores de entrada mínimo y máximos.
  */
 void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
-  
-  //rBajo = 1000;
-  //rArriba = 10000;
-  //vIn = 9;
+  //rBajo = 1000; rArriba = 10000; vIn = 9;
   float vMax = (rBajo/(rBajo+rArriba))*vIn;
-   _sensorMax = (int)(vMax*(1023/5));
+  _sensorMax = (int)(vMax*(1023/5));
   Serial.print("calibrado - Vout = ");
   Serial.println(_sensorMax);
 }
@@ -67,35 +64,27 @@ void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
  * Se convierte el valor de la entrada analógica para el voltaje y,
  * se calibra el nivel de la batería para que esté en el rango 0 - 100.
  */
-
-
 float SensorInteligente::leerVoltajeVelostat()
 {
-    voltajeAlfombra = analogRead(_pinA0);
-    voltajeMedido = (((float) voltajeAlfombra) * 5.0) / 1023.0;
-    Serial.print(voltajeMedido);
-    if(voltajeMedido < 1.0){
-      Serial.println(" - Sin presionar");
-    }else if(voltajeMedido < 3.0){
-      Serial.println(" - Presionando ligeramente");
-    }else if (voltajeMedido < 4.0){ 
-      Serial.println(" - Presionando medianamemente");
-    }else{
-      Serial.println(" - Presionando fuertemente");
-    }
-    return voltajeMedido;
+  voltajeAlfombra = analogRead(_pinA0);
+  voltajeMedido = (((float) voltajeAlfombra) * 5.0) / 1023.0;
+  Serial.print(voltajeMedido);
+  return voltajeMedido;
 }
 
 /*
  * Obtiene el nivel de bateria más bajo.
  * @params porcentajeBateria
  */
-float SensorInteligente::bateriaMenor(float porcentajeBateria) 
+float SensorInteligente::bateriaMenor(float porcentaje) 
 {
-  if ((porcentajeBateria < bateriaEnviar)) {
-    bateriaEnviar = porcentajeBateria;
-    return bateriaEnviar;
+  if (bateriaEnviar==100) {  
+    bateriaEnviar = porcentaje; 
   }
+  if ((porcentaje > bateriaEnviar-5)) {  
+    bateriaEnviar = porcentaje; 
+  }
+  return bateriaEnviar;
 }
 
 
@@ -104,46 +93,32 @@ float SensorInteligente::bateriaMenor(float porcentajeBateria)
  */
 void SensorInteligente::enviarBateria(long intervalo,float porcentaje) 
 {
-  int bateria = (int)SensorInteligente::bateriaMenor(porcentaje);
-  
-  
-  if((int)bateria > 67){
+  int bateria = (int)SensorInteligente::bateriaMenor(porcentaje); 
+  Serial.print("Bateria  enviar: ");
+  Serial.print(bateria);
+  Serial.print(" - Porcentaje bateria: ");
+  Serial.println(porcentaje); 
+  if((int)bateria > 30){
+    delay(intervalo-510);
+    Serial.println(" <- Enviando...");
     SensorInteligente::enviarPorcentajeBateria((int)bateriaEnviar);
-
-    
-      //delay(1000);
-    
-      delay(intervalo-500);
-      //Serial.println(" <- Enviando...");
+    Serial.println(" <- Enviado!!");
   }else{
     Serial.println("Bateria baja :(");
   }
-
-  Serial.print("Bateria enviar: ");
-  Serial.print(bateria);
-  Serial.print("Porcentaje bateria: ");
-  Serial.print(porcentaje);
 }
 
 void SensorInteligente::enviarPorcentajeBateria(int bateria){
-    Serial.println("AT$RC");
-    delay(500);
-    Serial.print("AT$SF=");
-    
-    //That's correct, but I should use int value
-    if ((int)bateria < 16)Serial.print("0");
-      Serial.println((int)bateria, HEX);
-
-  
-  
+  Serial.println("AT$RC");
+  delay(500);
+  Serial.print("AT$SF=");
+  if ((int)bateria < 16)Serial.print("0");
+  Serial.println((int)bateria, HEX);
 }
 
-
-float SensorInteligente::leerPorcentajeBateria(){  
-  //Serial.print(_sensorMax);  
+float SensorInteligente::leerPorcentajeBateria(){ 
   bateria = analogRead(_pinA1);    
-  delay(5);    
-  porcentajeBateria = map(bateria, 0, _sensorMax, 0, 100);        
+  delay(10);    
+  porcentajeBateria = map((int)bateria, 0, _sensorMax, 0, 100);        
   return porcentajeBateria;
-  
-  }
+}

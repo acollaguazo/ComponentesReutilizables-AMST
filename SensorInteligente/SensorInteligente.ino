@@ -7,22 +7,18 @@ const int pinA1 = A1;
 int contador = 0;
 
 Isigfox *Isigfox = new WISOL();
-SensorInteligente medicionBateria = SensorInteligente(pinA0, 1000, 10000, 9);
 SensorInteligente sensores = SensorInteligente(pinA0, pinA1);
 
 void setup() {
-
+  Serial.begin(9600);
   sensores.inicializar();  
   sensores.calibrarBateria(1000.0, 10000.0, 9.0);
-  
-  Serial.begin(9600);
   Isigfox->initSigfox();
   Isigfox->testComms();
   Isigfox->getZone();
 }
 
 void loop() {
-  //Isigfox->getZone();
   Serial.print("PRUEBA ");
   Serial.println(contador++);
 
@@ -34,13 +30,13 @@ void loop() {
   Serial.print("2 Voltaje = ");
   float voltaje = sensores.leerVoltajeVelostat();
   Serial.println(voltaje);
-  //sensores.enviarBateria(600);
   Serial.println("");
   enviarSigfox(voltaje, bateria);
   delay(1200);
 }
 
-void enviar(float sensor, int bateria){
+void enviar(float sensor, float bateria){
+  sensor = sensor*
   Serial.println("AT$RC");
   delay(500);
   Serial.print("AT$SF=");
@@ -49,15 +45,7 @@ void enviar(float sensor, int bateria){
   else if(sensor<20.019)Serial.print("0");
   Serial.print(sensor,HEX);
   if (bateria < 16)Serial.print("0");
-  Serial.println(bateria,HEX);
-}
-
-void enviarBateria(int bateria){
-  Serial.println("AT$RC");
-  Serial.print("AT$SF=");
-  //That's correct, but I should use int value
-  if (bateria < 16)Serial.print("0");
-  Serial.println(bateria,HEX);
+  Serial.println((int)bateria,HEX);
 }
 
 void enviarSigfox(float voltajeMedido, float porcentajeBateria) {
@@ -75,7 +63,10 @@ void enviarSigfox(float voltajeMedido, float porcentajeBateria) {
   buf_str[7] = float_bateria[3];
   
   uint8_t *sendData = buf_str;
-  int len = 9;
+  Send_Pload(buf_str, payloadSize);
+}
+
+void Send_Pload(uint8_t *sendData, const uint8_t len){
   recvMsg *RecvMsg;
   RecvMsg = (recvMsg *)malloc(sizeof(recvMsg));
   Isigfox->sendPayload(sendData, len, 0, RecvMsg);
