@@ -8,7 +8,7 @@ SensorInteligente medicionBateria = SensorInteligente(pinA1, 1000.0, 10000.0, 9.
 void setup() {
   Serial.begin(9600);
   medicionBateria.inicializar();  
-  medicionBateria.calibrarBateria(3300.0, 33000.0, 9.0);
+  medicionBateria.calibrarBateria(3300.0, 5000.0, 9.0);
 }
 
 void loop() {
