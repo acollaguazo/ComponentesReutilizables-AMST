@@ -1,4 +1,8 @@
-/*#include "SensorInteligente.h"
+/*
+// Archivo de ejemplo: VelostatBateria.ino
+// Utilizado para captura y envío de datos de una batería al Backend de Sigfox, mediante comandos AT.
+
+#include "SensorInteligente.h"
 #include <Isigfox.h>
 #include <WISOL.h>
 
@@ -33,19 +37,6 @@ void loop() {
   Serial.println("");
   enviarSigfox(voltaje, bateria);
   delay(1200);
-}
-
-void enviar(float sensor, float bateria){
-  sensor = sensor*
-  Serial.println("AT$RC");
-  delay(500);
-  Serial.print("AT$SF=");
-  if(sensor<0.078)Serial.print("000");
-  else if(sensor<1.25)Serial.print("00");
-  else if(sensor<20.019)Serial.print("0");
-  Serial.print(sensor,HEX);
-  if (bateria < 16)Serial.print("0");
-  Serial.println((int)bateria,HEX);
 }
 
 void enviarSigfox(float voltajeMedido, float porcentajeBateria) {

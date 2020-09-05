@@ -1,6 +1,9 @@
+// Archivo de ejemplo: Bateria.ino
+// Utilizado para captura y envío de datos de una batería al Backend de Sigfox, mediante comandos AT.
+ 
 #include "SensorInteligente.h"
 
-const int pinA1 = A0;
+const int pinA1 = A1;
 int contador = 1;
 
 SensorInteligente medicionBateria = SensorInteligente(pinA1, 1000.0, 10000.0, 9.0);
@@ -8,7 +11,7 @@ SensorInteligente medicionBateria = SensorInteligente(pinA1, 1000.0, 10000.0, 9.
 void setup() {
   Serial.begin(9600);
   medicionBateria.inicializar();  
-  medicionBateria.calibrarBateria(5000.0, 33000.0, 9.0);
+  medicionBateria.calibrarBateria(1000.0, 10000.0, 9.0);
 }
 
 void loop() {
@@ -24,5 +27,5 @@ void loop() {
   medicionBateria.enviarBateria(10000, bateria);
   //Serial.println(bateria);
   //enviarPorcentajeBateria((int)bateria);
-  //delay(5000);
+  delay(5000);
 }

@@ -1,5 +1,5 @@
 /*
- * ValoresSensados.cpp - Librería para detectar tanques de gas vacíos y mesas ocupadas peso usando velostat.
+ * ValoresSensados.cpp - Librería para detección de tanques de gas vacíos y mesas ocupadas peso usando velostat.
  * Created by Rosa M. Pincay, July 8, 2020.
  * Released into the ESPOL domain.
  */
@@ -8,26 +8,33 @@
 #include "Arduino.h"
 
 /** Crea un objeto de tipo SensorInteligente.
- * Sirve para medir el voltaje del velostat.
+ * Es necesario declarar el constructor de la función para poder utilizar sus métodos.
+ * Se utiliza para realizar mediciones de batería.
  * 
- * @param pinA0: pin análogo al que se conecta el velostat.
+ * @param pinA1: pin análogo al que se conecta la batería.
  */
-SensorInteligente::SensorInteligente(int pinA0, float r1, float r2, float vin)
+SensorInteligente::SensorInteligente(int pinA1, float r1, float r2, float vin)
 {
-  _pinA1 = pinA0;
+  _pinA1 = pinA1;
   _r1 = r1;
   _r2 = r2; 
   _vin = vin;
 }
 
-/*
- * Inicializa los puertos para establecer la comunicación serial UART
+/**
+ * Crea un objeto de tipo SensorInteligente.
+ * Es necesario declarar el constructor de la función para poder utilizar sus métodos.
+ * Se utiliza para medir los valores de la batería y el velostat.
+ * 
+ * @param pinA0: pin análogo al que se conecta el velostat.
+ * @param pinA1: pin análogo al que se conecta la fuente de alimentación.
  */
 SensorInteligente::SensorInteligente(int pinA0, int pinA1)
 {
   _pinA0 = pinA0;
   _pinA1 = pinA1;
 }
+
 
 void SensorInteligente::inicializar()
 {
@@ -39,6 +46,7 @@ void SensorInteligente::inicializar()
   bateria = 0.0;
   voltajeMedido = 0.0;
 }
+
 
 float SensorInteligente::leerVoltajeBateria()
 {
@@ -52,7 +60,6 @@ float SensorInteligente::leerVoltajeBateria()
  * para establecer los valores de entrada mínimo y máximos.
  */
 void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
-  //rBajo = 1000; rArriba = 10000; vIn = 9;
   float vMax = (rBajo/(rBajo+rArriba))*vIn;
   _sensorMax = (int)(vMax*(1023/5));
   Serial.print("calibrado - Vout = ");
@@ -78,17 +85,18 @@ float SensorInteligente::leerVoltajeVelostat()
  */
 float SensorInteligente::bateriaMenor(float porcentajeBateria) 
 {
-  /*if (bateriaEnviar==100) {  
-    bateriaEnviar = porcentaje; 
+  if (bateriaEnviar==100) {  
+    bateriaEnviar = porcentajeBateria; 
   }
-  if ((porcentaje > bateriaEnviar-5)) {  
-    bateriaEnviar = porcentaje; 
+  if ((porcentajeBateria > bateriaEnviar-5)) {  
+    bateriaEnviar = porcentajeBateria; 
   }
-  return bateriaEnviar;*/
-  if ((porcentajeBateria < bateriaEnviar)) {
+  return bateriaEnviar;
+  
+  /*if ((porcentajeBateria <= bateriaEnviar)) {
     bateriaEnviar = porcentajeBateria;
     return bateriaEnviar;
-  }
+  }*/
 }
 
 
@@ -106,9 +114,9 @@ void SensorInteligente::enviarBateria(long intervalo,float porcentaje)
     delay(intervalo-510);
     Serial.println(" <- Enviando...");
     SensorInteligente::enviarPorcentajeBateria((int)bateriaEnviar);
-    Serial.println(" <- Enviado!!");
+    Serial.println(" -> Enviado!!");
   }else{
-    Serial.println("Bateria baja :(");
+    Serial.println(" -> Bateria baja");
   }
 }
 

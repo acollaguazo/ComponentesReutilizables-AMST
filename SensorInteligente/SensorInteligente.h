@@ -1,14 +1,7 @@
-/*
- * ValoresSensados.h - Librería para detectar tanques de gas vacíos y mesas ocupadas peso usando velostat.
- * Created by Rosa M. Pincay, July 7, 2020.
- * Released into the ESPOL domain.
- */
-
-/* 
- * File:   SensorInteligente.h
- * Author: Rosa Pincay
- *
- * Created on 8 de julio de 2020
+/** Librería para detección de pesos usando velostat y para realizar mediciones de batería.
+ * Archivo:   SensorInteligente.h
+ * Autor:     Rosa Pincay Jiménez
+ * Creado:    8 de julio de 2020
  */
 
 #ifndef SENSORINTELIGENTE_H
@@ -18,39 +11,31 @@
 class SensorInteligente
 {
   public:
-    /*
-     * Crea un objeto de tipo SensorInteligente, 
-     * para medir el voltaje del velostat.
-     * 
-     * @param pinA0: pin análogo al que se conecta la bateria
-     */
-    SensorInteligente(int pinA0, float r1, float r2, float vin);
-    /*
-     * Crea un objeto de tipo SensorInteligente, 
-     * para medir los valores de la batería y el velostat.
-     * 
-     * @param pinA0: pin análogo al que se conecta el velostat
-     * @param pinA1: pin análogo al que se conecta la fuente de alimentación
-     */
+  
+    // Constructores de la librería
+    SensorInteligente(int pinA1, float r1, float r2, float vin);
     SensorInteligente(int pinA0, int pinA1);
-
     
+    // Funciones
     void inicializar();
     void calibrarBateria(float rBajo, float rArriba, float vIn);
-    float leerVoltajeBateria();
-    float voltajeBateria;
-    float leerPorcentajeBateria();
-    float leerVoltajeVelostat();
-    int leerVoltajeVelostatAnalogico();
-    float bateriaMenor(float porcentajeBateria);
     void enviarBateria(long intervalo, float porcentajeBateria);    
     void enviarPorcentajeBateria(int porcentaje);
+    float bateriaMenor(float porcentajeBateria);    
+    float leerVoltajeBateria();
+    float leerPorcentajeBateria();
+    float leerVoltajeVelostat();
+
+    // Variables
+    float voltajeBateria;
     float bateria;
     float porcentajeBateria;
-    int voltajeAlfombra;
     float voltajeMedido;
-    float bateriaEnviar;
+    float bateriaEnviar;    
+    int voltajeAlfombra;
+    
   private:
+  
     int _pinA0;
     int _pinA1;
     int _r1;
