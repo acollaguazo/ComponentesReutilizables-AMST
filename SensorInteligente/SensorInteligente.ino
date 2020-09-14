@@ -1,63 +1,88 @@
-/*
-// Archivo de ejemplo: VelostatBateria.ino
-// Utilizado para captura y envío de datos de una batería al Backend de Sigfox, mediante comandos AT.
+// @file    VelostatBateria.ino
+// @brief   Archivo de ejemplo que puede ser utilizado para captura/envío del
+//          voltaje de un sensor de peso y del porcentaje de una batería 
+//          al Backend de Sigfox, haciendo uso de comandos AT.
 
 #include "SensorInteligente.h"
-#include <Isigfox.h>
 #include <WISOL.h>
+#include <Isigfox.h>
 
 const int pinA0 = A0;
 const int pinA1 = A1;
-int contador = 0;
-
-Isigfox *Isigfox = new WISOL();
+int contador = 1;
+char cadena[11];
+//Isigfox *Isigfox = new WISOL();
 SensorInteligente sensores = SensorInteligente(pinA0, pinA1);
 
 void setup() {
   Serial.begin(9600);
   sensores.inicializar();  
-  sensores.calibrarBateria(1000.0, 10000.0, 9.0);
-  Isigfox->initSigfox();
-  Isigfox->testComms();
-  Isigfox->getZone();
+  sensores.calibrarBateria(1220.0, 1000.0, 9);
+  //Isigfox->initSigfox();
+  //Isigfox->testComms();
 }
 
 void loop() {
+  Serial.println();
   Serial.print("PRUEBA ");
   Serial.println(contador++);
-
-  Serial.print("1 Porcentaje de bateria = ");
-  float bateria = sensores.leerPorcentajeBateria();
-  delay(5);
+  Serial.print(" 1 Porcentaje de bateria = ");
+  int bateria = sensores.leerPorcentajeBateria();
   Serial.print(bateria);
   Serial.println("%");
-  Serial.print("2 Voltaje = ");
-  float voltaje = sensores.leerVoltajeVelostat();
+  Serial.print(" 2 Voltaje del velostat = ");
+  float voltaje = 1.85;
   Serial.println(voltaje);
-  Serial.println("");
-  enviarSigfox(voltaje, bateria);
-  delay(1200);
+  //sensores.leerVoltajeVelostat();
+  uint8_t byteBateria = (uint8_t)bateria;
+ // Serial.println("");
+  byte *float_velostat = (byte *)&voltaje;
+  //byte *float_bateria = (byte *)&bateria;
+  const uint8_t payloadSize = 5;
+  uint8_t bufferDatos[payloadSize];
+  bufferDatos[0] = float_velostat[0];
+  bufferDatos[1] = float_velostat[1];
+  bufferDatos[2] = float_velostat[2];
+  bufferDatos[3] = float_velostat[3];
+  bufferDatos[4] = byteBateria;
+  /*bufferDatos[5] = float_bateria[1];  
+  bufferDatos[6] = float_bateria[2];
+  bufferDatos[7] = float_bateria[3];*/
+  
+  uint8_t *sendData = bufferDatos;
+  //
+  Serial.print(" Bateria en hexadecimal: ");
+  Serial.println(bufferDatos[4],HEX);
+  
+  
+ for (int i = 0; i < sizeof(bufferDatos); i++) {
+char cad[2];
+//cad[2] = imprimirEnHex(bufferDatos[i]);
+sprintf(cad, "%02x", bufferDatos[i]);
+strcat(cadena, cad);
+//Serial.println(str);
+}
+
+
+
+Serial.print(" Cadena: "); 
+Serial.println(cadena);
+char * enviar = sensores.rot47(cadena);
+Serial.print(" rot 47: "); 
+//Serial.println(sizeof(enviar));
+Serial.println("AT$RC");
+delay(500);
+Serial.print("AT$SF=");
+Serial.println(enviar);
+delay(3000);
 }
 
 void enviarSigfox(float voltajeMedido, float porcentajeBateria) {
-  byte *float_velostat = (byte *)&voltajeMedido;
-  byte *float_bateria = (byte *)&porcentajeBateria;
-  const uint8_t payloadSize = 9;
-  uint8_t buf_str[payloadSize];
-  buf_str[0] = float_velostat[0];
-  buf_str[1] = float_velostat[1];
-  buf_str[2] = float_velostat[2];
-  buf_str[3] = float_velostat[3];
-  buf_str[4] = float_bateria[0];
-  buf_str[5] = float_bateria[1];  
-  buf_str[6] = float_bateria[2];
-  buf_str[7] = float_bateria[3];
   
-  uint8_t *sendData = buf_str;
-  Send_Pload(buf_str, payloadSize);
+//  Send_Pload(bufferDatos, payloadSize);
 }
 
-void Send_Pload(uint8_t *sendData, const uint8_t len){
+/*void Send_Pload(uint8_t *sendData, const uint8_t len){
   recvMsg *RecvMsg;
   RecvMsg = (recvMsg *)malloc(sizeof(recvMsg));
   Isigfox->sendPayload(sendData, len, 0, RecvMsg);
@@ -66,5 +91,24 @@ void Send_Pload(uint8_t *sendData, const uint8_t len){
   }
   Serial.println("");
   free(RecvMsg);
+}*/
+
+/*void imprimirEnHex(uint8_t num){
+char str[2];
+sprintf(str, "%02x", num);
+Serial.print(str);
+//return str;
 }
-*/
+char *rot47(char *s)
+{
+  char *p = s;
+  while(*p) {
+  if(*p >= '!' && *p <= 'O'){
+  *p = ((*p + 47) % 127);
+  }else if(*p >= 'P' && *p <= '~'){
+  *p = ((*p - 47) % 127);
+  }
+  p++;
+  }
+  return s;
+}

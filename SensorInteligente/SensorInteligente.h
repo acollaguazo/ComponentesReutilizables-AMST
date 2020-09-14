@@ -1,7 +1,8 @@
-/** Librería para detección de pesos usando velostat y para realizar mediciones de batería.
- * Archivo:   SensorInteligente.h
- * Autor:     Rosa Pincay Jiménez
- * Creado:    8 de julio de 2020
+/** @file     SensorInteligente.h
+ *  @date     8 de julio de 2020
+ *  @authors  Rosa Pincay, Javier Arce
+ *  @brief    Librería para detección de pesos usando velostat y para realizar mediciones de batería. 
+ *            Incluye el envío de datos encriptados a Sigfox Backend.    
  */
 
 #ifndef SENSORINTELIGENTE_H
@@ -11,39 +12,34 @@
 class SensorInteligente
 {
   public:
-  
     // Constructores de la librería
-    SensorInteligente(int pinA1, float r1, float r2, float vin);
+    SensorInteligente();
+    SensorInteligente(int pinA1);
     SensorInteligente(int pinA0, int pinA1);
     
     // Funciones
     void inicializar();
+    void tiempoEspera(long intervalo, float voltajeSensor, float porcentajeBateria, void (*funcionEnvio)(float, float));
     void calibrarBateria(float rBajo, float rArriba, float vIn);
-    void enviarBateria(long intervalo, float porcentajeBateria);    
+    void enviarBateria(long intervalo, int porcentajeBateria);    
     void enviarPorcentajeBateria(int porcentaje);
-    float bateriaMenor(float porcentajeBateria);    
+    int compararNivelBateria(int porcentajeBateria);    
     float leerVoltajeBateria();
-    float leerPorcentajeBateria();
+    int leerPorcentajeBateria();
     float leerVoltajeVelostat();
+    char *rot47(char *s);
 
     // Variables
     float voltajeBateria;
-    float bateria;
-    float porcentajeBateria;
-    float voltajeMedido;
-    float bateriaEnviar;    
-    int voltajeAlfombra;
+    int porcentajeBateria;     
+    int nivelBateriaMayor;
+    float voltajeSensor;  
     
   private:
-  
     int _pinA0;
     int _pinA1;
-    int _r1;
-    int _r2;
-    int _vin;
-    float _sensorMax;
-    long _tiempoAnterior;
-    
+    int _limiteMaximoBateria; 
+    unsigned long _tiempoAnterior;  
 };
 
 #endif /* SENSORINTELIGENTE_H */

@@ -1,33 +1,30 @@
-/*
- * ValoresSensados.cpp - Librería para detección de tanques de gas vacíos y mesas ocupadas peso usando velostat.
- * Created by Rosa M. Pincay, July 8, 2020.
- * Released into the ESPOL domain.
+/** @file     SensorInteligente.cpp 
+ *  @date     8 de julio de 2020
+ *  @authors  Rosa Pincay, Javier Arce
+ *  @brief    Librería para detección de pesos usando velostat y para realizar mediciones de batería. 
+ *            Incluye el envío de datos encriptados a Sigfox Backend.    
  */
-
+ 
 #include "SensorInteligente.h"
 #include "Arduino.h"
 
-/** Crea un objeto de tipo SensorInteligente.
- * Es necesario declarar el constructor de la función para poder utilizar sus métodos.
- * Se utiliza para realizar mediciones de batería.
- * 
- * @param pinA1: pin análogo al que se conecta la batería.
+
+/** 
+ * @brief   Crea un objeto de tipo SensorInteligente, se utiliza para realizar mediciones de batería.
+ *          Es necesario declarar el constructor de la función para poder utilizar sus métodos.
+ * @param   pinA1: pin analógico al que se conecta la batería.
  */
-SensorInteligente::SensorInteligente(int pinA1, float r1, float r2, float vin)
+SensorInteligente::SensorInteligente(int pinA1)
 {
   _pinA1 = pinA1;
-  _r1 = r1;
-  _r2 = r2; 
-  _vin = vin;
 }
 
+
 /**
- * Crea un objeto de tipo SensorInteligente.
- * Es necesario declarar el constructor de la función para poder utilizar sus métodos.
- * Se utiliza para medir los valores de la batería y el velostat.
- * 
- * @param pinA0: pin análogo al que se conecta el velostat.
- * @param pinA1: pin análogo al que se conecta la fuente de alimentación.
+ * @brief   Crea un objeto de tipo SensorInteligente, se utiliza para medir los valores de la batería y el velostat.
+ *          Es necesario declarar el constructor de la función para poder utilizar sus métodos.
+ * @param   pinA0: pin analógico al que se conecta el velostat.
+ * @param   pinA1: pin analógico al que se conecta la fuente de alimentación.
  */
 SensorInteligente::SensorInteligente(int pinA0, int pinA1)
 {
@@ -36,101 +33,172 @@ SensorInteligente::SensorInteligente(int pinA0, int pinA1)
 }
 
 
+/**
+ * @brief   Inicializa las variables públicas y privadas que son utilizadas en la librería.
+ */
 void SensorInteligente::inicializar()
 {
-  voltajeBateria = 0.0;
-  _sensorMax = 0;
+  _limiteMaximoBateria = 0;
   _tiempoAnterior = 0.0;
-  bateriaEnviar = 100.0;
-  porcentajeBateria = 0.0;
-  bateria = 0.0;
-  voltajeMedido = 0.0;
+  nivelBateriaMayor = 100;
+  voltajeBateria = 0.0;
+  porcentajeBateria = 0;
+  voltajeSensor = 0.0;
 }
 
 
+/**
+ * @brief   Función que realiza la lectura del pin analógico A1 y convierte ese valor a un voltaje.
+ * @return  voltajeBateria: valor de tipo float en el rango de [0, 5].
+ */
 float SensorInteligente::leerVoltajeBateria()
 {
-  bateria = analogRead(_pinA1);   
-  voltajeBateria = (((float) bateria) * 5.0) / 1023.0;
+  analogRead(_pinA1);   
+  delay(2); // permite que se estabilice el convertidor analógico-digital (ADC).
+  voltajeBateria = (((float) analogRead(_pinA1)) * 5.0) / 1023.0;
   return voltajeBateria;
 }
 
-/*
- * Realiza la lectura del voltaje de la batería durante los primeros 2 segundos 
- * para establecer los valores de entrada mínimo y máximos.
+
+/** 
+ * @brief   Función que se debe utilizar de forma obligatoria si se requiere obtener el porcentaje de batería.
+ *          Es necesario que se implemente un divisor de voltaje. 
+ *          Establece el voltaje máximo de entrada que entrega la batería en el rango de [0, 1023].
+ *          Debe utilizarse en la función setup() luego de inicializar las variables de la librería.
+ * @param   rBajo: valor de la resistencia en Ohmios (Ω) que se encuentra conectada al negativo.
+ * @param   rArriba: valor de la resistencia en Ohmios Ohmios (Ω) que está conectada al positivo.
+ * @param   VIn: voltaje de la batería, puede indicar un voltaje nominal o realizar mediciones con un multímetro.
  */
 void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
-  float vMax = (rBajo/(rBajo+rArriba))*vIn;
-  _sensorMax = (int)(vMax*(1023/5));
-  Serial.print("calibrado - Vout = ");
-  Serial.println(_sensorMax);
+  float vMax = (rBajo / (rBajo + rArriba)) * vIn;
+  _limiteMaximoBateria = (int)(vMax * (1023 / 5));
+  Serial.print("Calibrado! - El valor analogico maximo de bateria es = ");
+  Serial.println(_limiteMaximoBateria);
 }
 
-/*
- * Toma los valores sensados por el velostat y de la batería. 
- * Se convierte el valor de la entrada analógica para el voltaje y,
- * se calibra el nivel de la batería para que esté en el rango 0 - 100.
+
+/**
+ * @brief   Función que se encarga de mapear el nivel de la batería en el rango de [0, 100]
+ * @return  porcentajeBateria: valor de tipo int que indica el nivel actual de carga de la batería.
+ */
+int SensorInteligente::leerPorcentajeBateria(){ 
+  analogRead(_pinA1);    
+  delay(5); // permite que se estabilice el convertidor analógico-digital (ADC).
+  porcentajeBateria = map((int)analogRead(_pinA1), 0, _limiteMaximoBateria, 0, 100);        
+  return porcentajeBateria;
+}
+
+
+/**
+ * @brief   Mide el voltaje del velostat el cual se encuentra conectado al pinA0.
+ * @return  voltajeSensor: valor de tipo float del voltaje del velostat en el rango [0, 5].
  */
 float SensorInteligente::leerVoltajeVelostat()
 {
-  voltajeAlfombra = analogRead(_pinA0);
-  voltajeMedido = (((float) voltajeAlfombra) * 5.0) / 1023.0;
-  Serial.print(voltajeMedido);
-  return voltajeMedido;
+  int voltajeAlfombra = analogRead(_pinA0);
+  voltajeSensor = (((float) voltajeAlfombra) * 5.0) / 1023.0;
+  return voltajeSensor;
 }
 
-/*
- * Obtiene el nivel de bateria más bajo.
- * @params porcentajeBateria
+
+/**
+ * @brief   Obtiene el nivel de bateria más bajo que ha sido censado.
+ *          Si existe una caída del nivel de la batería mayor al 5% el porcentaje no cambiará.
+ * @param   porcentajeBatería: valor que será leído continuamente en el programa.
+ * @return  nivelBateriaMayor: devuelve el porcentaje de batería mayor que ha sido leído.
  */
-float SensorInteligente::bateriaMenor(float porcentajeBateria) 
+int SensorInteligente::compararNivelBateria(int porcentajeBateria) 
 {
-  if (bateriaEnviar==100) {  
-    bateriaEnviar = porcentajeBateria; 
+  if (nivelBateriaMayor == 100) {  
+    nivelBateriaMayor = porcentajeBateria; 
   }
-  if ((porcentajeBateria > bateriaEnviar-5)) {  
-    bateriaEnviar = porcentajeBateria; 
+  if ((porcentajeBateria > nivelBateriaMayor - 5)) {  
+    nivelBateriaMayor = porcentajeBateria; 
   }
-  return bateriaEnviar;
+  return nivelBateriaMayor;
   
-  /*if ((porcentajeBateria <= bateriaEnviar)) {
-    bateriaEnviar = porcentajeBateria;
-    return bateriaEnviar;
+  /*if ((porcentajeBateria <= nivelBateriaMayor)) {
+    nivelBateriaMayor = porcentajeBateria;
+    return nivelBateriaMayor;
   }*/
 }
 
 
-/*
- * Función que envía el nivel de la batería a Sigfox en el intervalo asignado
+/**
+ * @brief   Función que determina el envío de la batería dado cierto intervalo de tiempo.
+ *          La batería solo se envía cuando el nivel es mayor a 30%.
+ * @param   intervalo: tiempo de espera para realizar el envío del valor de la batería.
+ * @param   porcentaje: 
  */
-void SensorInteligente::enviarBateria(long intervalo,float porcentaje) 
+void SensorInteligente::enviarBateria(long intervalo, int porcentaje) 
 {
-  int bateria = (int)SensorInteligente::bateriaMenor(porcentaje); 
-  Serial.print("Bateria  enviar: ");
+  int bateria = SensorInteligente::compararNivelBateria(porcentaje); 
+  Serial.print("Bateria: ");
   Serial.print(bateria);
   Serial.print(" - Porcentaje bateria: ");
-  Serial.println(porcentaje); 
-  if((int)bateria > 30){
-    delay(intervalo-510);
-    Serial.println(" <- Enviando...");
-    SensorInteligente::enviarPorcentajeBateria((int)bateriaEnviar);
-    Serial.println(" -> Enviado!!");
-  }else{
-    Serial.println(" -> Bateria baja");
+  Serial.println(porcentaje);
+  if (millis() - _tiempoAnterior > intervalo) {
+    _tiempoAnterior = millis();
+    if(bateria > 30){
+      //Serial.println(_tiempoAnterior);
+      //Serial.println(millis());
+      SensorInteligente::enviarPorcentajeBateria(nivelBateriaMayor);
+    }else{
+      Serial.println(" -> Bateria baja");
+    }
   }
 }
 
-void SensorInteligente::enviarPorcentajeBateria(int bateria){
+
+/** 
+ * @brief   Realiza el envío de la batería utilizando el algoritmo rot47 para que los datos lleguen encriptados al Backend de Sigfox.
+ *          Utiliza comandos AT para enviar un único byte, no se necesita la librería Isigfox.
+ * @param   bateria: valor entero del porcentaje de la batería [0, 100] que se desea enviar.
+ */
+void SensorInteligente::enviarPorcentajeBateria(int bateria){  
+  char cadena[2];
+  for (int i = 0; i < sizeof((uint8_t)bateria); i++) {
+    char str[1];
+    sprintf(str, "%02x", (uint8_t)bateria);
+    strcat(cadena, str);
+  }
+  Serial.print("cadena: ");
+  Serial.println(cadena);  
+  char *enviar = rot47(cadena);
   Serial.println("AT$RC");
   delay(500);
   Serial.print("AT$SF=");
   if ((int)bateria < 16)Serial.print("0");
-  Serial.println((int)bateria, HEX);
+  Serial.println(bateria, HEX);
+  //Serial.println(enviar);  
+  memset(enviar,'\0',strlen(enviar));
+  memset(cadena,'\0',strlen(cadena));
 }
 
-float SensorInteligente::leerPorcentajeBateria(){ 
-  bateria = analogRead(_pinA1);    
-  delay(10);    
-  porcentajeBateria = map((int)bateria, 0, _sensorMax, 0, 100);        
-  return porcentajeBateria;
+
+char *SensorInteligente::rot47(char *s)
+{
+  char *p = s;
+  while(*p) {
+    if(*p >= '!' && *p <= 'O'){
+      *p = ((*p + 47) % 127);
+    }else if(*p >= 'P' && *p <= '~'){
+      *p = ((*p - 47) % 127);
+    }
+    p++;
+  }
+  return s;
+}
+
+
+/**
+ * @brief   Función que envía un buffer a Sigfox en el intervalo asignado
+ */
+void SensorInteligente::tiempoEspera(long intervalo, float voltajeSensor, float porcentajeBateria, void (*funcionEnvio)(float, float)) 
+{
+  long tiempoA = millis();  
+  if (millis() - _tiempoAnterior > intervalo) {
+    _tiempoAnterior = millis();
+    funcionEnvio(voltajeSensor, porcentajeBateria);
+  }
 }
