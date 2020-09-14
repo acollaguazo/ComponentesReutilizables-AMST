@@ -1,4 +1,3 @@
-/*
 // @file    VelostatBateria.ino
 // @brief   Archivo de ejemplo que puede ser utilizado para captura/envío del
 //          voltaje de un sensor de peso y del porcentaje de una batería 
@@ -12,15 +11,15 @@ const int pinA0 = A0;
 const int pinA1 = A1;
 int contador = 1;
 char cadena[11];
-//Isigfox *Isigfox = new WISOL();
+Isigfox *Isigfox = new WISOL();
 SensorInteligente sensores = SensorInteligente(pinA0, pinA1);
 
 void setup() {
   Serial.begin(9600);
   sensores.inicializar();
   sensores.calibrarBateria(1220.0, 1000.0, 9);
-  //Isigfox->initSigfox();
-  //Isigfox->testComms();
+  Isigfox->initSigfox();
+  Isigfox->testComms();
 }
 
 void loop() {
@@ -46,36 +45,24 @@ void loop() {
   bufferDatos[2] = float_velostat[2];
   bufferDatos[3] = float_velostat[3];
   bufferDatos[4] = byteBateria;
+  /*
+  bufferDatos[5] = float_bateria[1];  
+  bufferDatos[6] = float_bateria[2];
+  bufferDatos[7] = float_bateria[3];
+  Serial.print(" Bateria en hexadecimal: ");
+  Serial.println(bufferDatos[4],HEX);
+  */
   
   uint8_t *sendData = bufferDatos;
   
-  Serial.print(" Bateria en hexadecimal: ");
-  Serial.println(bufferDatos[4],HEX);
+  Send_Pload(sendData, payloadSize);
   
-  Serial.println(millis());
-  for (int i = 0; i < sizeof(bufferDatos); i++) {
-    char cad[2];
-    //cad[2] = imprimirEnHex(bufferDatos[i]);
-    sprintf(cad, "%02x", bufferDatos[i]);
-    strcat(cadena, cad);
-  }
-  Serial.println(millis());
-  Serial.print(" Cadena: "); 
-  Serial.println(cadena);
-  char * enviar = sensores.rot47(cadena);
-  //Serial.print(" rot 47: "); 
-  //Serial.println(sizeof(enviar));
-  Serial.println("AT$RC");
-  delay(100);
-  Serial.print("AT$SF=");
-  Serial.println(enviar);
   delay(3000);
-  memset(enviar, '\0', strlen(enviar));
-  memset(cadena, '\0', strlen(cadena));
 }
 
 void enviarSigfox(float voltajeMedido, float porcentajeBateria) {
-  //  Send_Pload(bufferDatos, payloadSize);
+  
+//  Send_Pload(bufferDatos, payloadSize);
 }
 
 void Send_Pload(uint8_t *sendData, const uint8_t len){
@@ -87,4 +74,24 @@ void Send_Pload(uint8_t *sendData, const uint8_t len){
   }
   Serial.println("");
   free(RecvMsg);
-}*/
+}
+
+void imprimirEnHex(uint8_t num){
+  char str[2];
+  sprintf(str, "%02x", num);
+  Serial.print(str);
+}
+
+char *rot47(char *s)
+{
+  char *p = s;
+  while(*p) {
+  if(*p >= '!' && *p <= 'O'){
+  *p = ((*p + 47) % 127);
+  }else if(*p >= 'P' && *p <= '~'){
+  *p = ((*p - 47) % 127);
+  }
+  p++;
+  }
+  return s;
+}

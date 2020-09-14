@@ -171,8 +171,8 @@ void SensorInteligente::enviarPorcentajeBateria(int bateria){
   if ((int)bateria < 16)Serial.print("0");
   Serial.println(bateria, HEX);
   //Serial.println(enviar);  
-  memset(enviar,'\0',strlen(enviar));
-  memset(cadena,'\0',strlen(cadena));
+  memset(enviar, '\0', strlen(enviar));
+  memset(cadena, '\0', strlen(cadena));
 }
 
 
