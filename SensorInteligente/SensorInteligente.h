@@ -33,7 +33,8 @@ class SensorInteligente
     float voltajeBateria;
     int porcentajeBateria;     
     int nivelBateriaMayor;
-    float voltajeSensor;  
+    float voltajeSensor; 
+    float bateria; 
     
   private:
     int _pinA0;

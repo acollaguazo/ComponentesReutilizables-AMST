@@ -1,3 +1,4 @@
+/*
 // @file    VelostatBateria.ino
 // @brief   Archivo de ejemplo que puede ser utilizado para captura/envío del
 //          voltaje de un sensor de peso y del porcentaje de una batería 
@@ -45,13 +46,7 @@ void loop() {
   bufferDatos[2] = float_velostat[2];
   bufferDatos[3] = float_velostat[3];
   bufferDatos[4] = byteBateria;
-  /*
-  bufferDatos[5] = float_bateria[1];  
-  bufferDatos[6] = float_bateria[2];
-  bufferDatos[7] = float_bateria[3];
-  Serial.print(" Bateria en hexadecimal: ");
-  Serial.println(bufferDatos[4],HEX);
-  */
+  
   
   uint8_t *sendData = bufferDatos;
   
@@ -94,4 +89,4 @@ char *rot47(char *s)
   p++;
   }
   return s;
-}
+}*/
