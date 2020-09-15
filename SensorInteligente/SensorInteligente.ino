@@ -69,9 +69,10 @@ void loop() {
   delay(100);
   Serial.print("AT$SF=");
   Serial.println(enviar);
-  delay(3000);
+  
   memset(enviar, '\0', strlen(enviar));
   memset(cadena, '\0', strlen(cadena));
+  delay(3000);
 }
 
 void enviarSigfox(float voltajeMedido, float porcentajeBateria) {

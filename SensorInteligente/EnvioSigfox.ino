@@ -1,4 +1,4 @@
-/*
+
 // @file    VelostatBateria.ino
 // @brief   Archivo de ejemplo que puede ser utilizado para captura/envío del
 //          voltaje de un sensor de peso y del porcentaje de una batería 
@@ -28,11 +28,11 @@ void loop() {
   Serial.print("PRUEBA ");
   Serial.println(contador++);
   Serial.print(" 1 Porcentaje de bateria = ");
-  int bateria = sensores.leerPorcentajeBateria();
+  int bateria = 81;
   Serial.print(bateria);
   Serial.println("%");
   Serial.print(" 2 Voltaje del velostat = ");
-  float voltaje = sensores.leerVoltajeBateria();
+  float voltaje = 1.751;
   Serial.println(voltaje);
   //sensores.leerVoltajeVelostat();
   uint8_t byteBateria = (uint8_t)bateria;
@@ -46,12 +46,36 @@ void loop() {
   bufferDatos[2] = float_velostat[2];
   bufferDatos[3] = float_velostat[3];
   bufferDatos[4] = byteBateria;
-  
-  
+    
   uint8_t *sendData = bufferDatos;
-  
-  Send_Pload(sendData, payloadSize);
-  
+  for (int i = 0; i < sizeof(bufferDatos); i++) {
+    char cad[2];
+    //cad[2] = imprimirEnHex(bufferDatos[i]);
+    sprintf(cad, "%02x", bufferDatos[i]);
+    strcat(cadena, cad);
+  }
+  Serial.println(millis());
+  Serial.print(" Cadena: "); 
+  Serial.println(cadena);
+  char * enviar = sensores.rot47(cadena);
+  Serial.println(enviar);
+  const uint8_t payload = 10;
+  uint8_t newBuffer[payload];
+  newBuffer[0]= cadena[0];
+  newBuffer[1]= cadena[1];
+  newBuffer[2]= cadena[2];
+  newBuffer[3]= cadena[3];
+  newBuffer[4]= cadena[4];
+  newBuffer[5]= cadena[5];
+  newBuffer[6]= cadena[6];
+  newBuffer[7]= cadena[7];
+  newBuffer[8]= cadena[8];
+  newBuffer[9]= cadena[9];
+  Send_Pload(newBuffer, 10);
+ 
+  memset(enviar, '\0', strlen(enviar));
+  memset(cadena, '\0', strlen(cadena));
+
   delay(3000);
 }
 
@@ -89,4 +113,4 @@ char *rot47(char *s)
   p++;
   }
   return s;
-}*/
+}

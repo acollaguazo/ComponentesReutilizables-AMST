@@ -138,15 +138,16 @@ void SensorInteligente::enviarBateria(long intervalo, int porcentaje)
   Serial.print(bateria);
   Serial.print(" - Porcentaje bateria: ");
   Serial.println(porcentaje);
-  if (millis() > _tiempoAnterior + intervalo) {
+  //if (millis() - _tiempoAnterior > intervalo) {
+    _tiempoAnterior = millis();
     if(bateria > 30){
-      Serial.println(_tiempoAnterior);
+      //Serial.println(_tiempoAnterior);
+      //Serial.println(millis());
       SensorInteligente::enviarPorcentajeBateria(bateria);
     }else{
       Serial.println(" -> Bateria baja");
     }
-    _tiempoAnterior = _tiempoAnterior + intervalo;
-  }
+  //}
 }
 
 
@@ -168,9 +169,9 @@ void SensorInteligente::enviarPorcentajeBateria(int bateria){
   Serial.println("AT$RC");
   delay(500);
   Serial.print("AT$SF=");
-  //if ((int)bateria < 16)Serial.print("0");
-  //Serial.println(bateria, HEX);
-  Serial.println(enviar);  
+  if ((int)bateria < 16)Serial.print("0");
+  Serial.println(bateria, HEX);
+  //Serial.println(enviar);  
   memset(enviar, '\0', strlen(enviar));
   memset(cadena, '\0', strlen(cadena));
 }

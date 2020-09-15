@@ -1,4 +1,4 @@
-
+/*
 // @file    Bateria.ino
 // @brief   Archivo de ejemplo que puede ser utilizado para la captura/envío del
 //          porcentaje de una batería al Backend de Sigfox, mediante comandos AT.
@@ -29,3 +29,4 @@ void loop() {
   medicionBateria.enviarBateria(10000, bateria);
   delay(1000);
 }
+*/
