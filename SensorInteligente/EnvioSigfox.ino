@@ -1,4 +1,4 @@
-
+/*
 // @file    VelostatBateria.ino
 // @brief   Archivo de ejemplo que puede ser utilizado para captura/envío del
 //          voltaje de un sensor de peso y del porcentaje de una batería 
@@ -59,29 +59,26 @@ void loop() {
   Serial.println(cadena);
   char * enviar = sensores.rot47(cadena);
   Serial.println(enviar);
+  
+  uint8_t *c = (uint8_t *)cadena;
   const uint8_t payload = 10;
   uint8_t newBuffer[payload];
-  newBuffer[0]= cadena[0];
-  newBuffer[1]= cadena[1];
-  newBuffer[2]= cadena[2];
-  newBuffer[3]= cadena[3];
-  newBuffer[4]= cadena[4];
-  newBuffer[5]= cadena[5];
-  newBuffer[6]= cadena[6];
-  newBuffer[7]= cadena[7];
-  newBuffer[8]= cadena[8];
-  newBuffer[9]= cadena[9];
+  newBuffer[0]= c[0];
+  newBuffer[1]= c[1];
+  newBuffer[2]= c[2];
+  newBuffer[3]= c[3];
+  newBuffer[4]= c[4];
+  newBuffer[5]= c[5];
+  newBuffer[6]= c[6];
+  newBuffer[7]= c[7];
+  newBuffer[8]= c[8];
+  newBuffer[9]= c[9];
   Send_Pload(newBuffer, 10);
  
   memset(enviar, '\0', strlen(enviar));
   memset(cadena, '\0', strlen(cadena));
 
   delay(3000);
-}
-
-void enviarSigfox(float voltajeMedido, float porcentajeBateria) {
-  
-//  Send_Pload(bufferDatos, payloadSize);
 }
 
 void Send_Pload(uint8_t *sendData, const uint8_t len){
@@ -93,12 +90,6 @@ void Send_Pload(uint8_t *sendData, const uint8_t len){
   }
   Serial.println("");
   free(RecvMsg);
-}
-
-void imprimirEnHex(uint8_t num){
-  char str[2];
-  sprintf(str, "%02x", num);
-  Serial.print(str);
 }
 
 char *rot47(char *s)
@@ -114,3 +105,4 @@ char *rot47(char *s)
   }
   return s;
 }
+*/
