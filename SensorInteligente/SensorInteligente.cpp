@@ -158,6 +158,7 @@ void SensorInteligente::enviarBateria(long intervalo, int porcentaje)
  */
 void SensorInteligente::enviarPorcentajeBateria(int bateria){  
   char cadena[2];
+  char cadenaEnviar[3];
   for (int i = 0; i < sizeof((uint8_t)bateria); i++) {
     char str[1];
     sprintf(str, "%02x", (uint8_t)bateria);
@@ -166,14 +167,27 @@ void SensorInteligente::enviarPorcentajeBateria(int bateria){
   Serial.print("cadena: ");
   Serial.println(cadena);  
   char *enviar = rot47(cadena);
+  uint8_t *c = (uint8_t *)cadena;
+  const uint8_t payload = 2;
+  uint8_t newBuffer[payload];
+  newBuffer[0] = c[0];
+  newBuffer[1] = c[1];
+  for (int i = 0; i < sizeof(newBuffer); i++){
+    char cad1[2];
+    sprintf(cad1, "%02x", newBuffer[i]);
+    strcat(cadenaEnviar, cad1);
+  }
+  Serial.print("rot47: ");Serial.println(enviar);
   Serial.println("AT$RC");
-  delay(500);
+  delay(100);
   Serial.print("AT$SF=");
   if ((int)bateria < 16)Serial.print("0");
-  Serial.println(bateria, HEX);
-  //Serial.println(enviar);  
+  //Serial.println(bateria, HEX);
+  Serial.println(cadenaEnviar);  
   memset(enviar, '\0', strlen(enviar));
   memset(cadena, '\0', strlen(cadena));
+  memset(cadena, '\0', strlen(cadenaEnviar));
+  delay(3000);
 }
 
 
