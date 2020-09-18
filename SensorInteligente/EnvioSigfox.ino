@@ -59,7 +59,11 @@ void loop() {
   Serial.println(cadena);
   char * enviar = sensores.rot47(cadena);
   Serial.println(enviar);
-  
+  /*La cadena enviar no se puede enviar por lo que contiene caracteres especiales que no son aceptados 
+  * por el backend de Sigfox por lo que se hace un casting hacia uint8_t para almacenar los caracteres
+  * de la cadena como bytes uint8_t *c = (uint8_t *)cadena, para alli recorrer el buffer, concatenar en
+  * cadenaEnviar y enviar mediante comandos AT.
+  * /
   uint8_t *c = (uint8_t *)cadena;
   const uint8_t payload = 10;
   uint8_t newBuffer[payload];
