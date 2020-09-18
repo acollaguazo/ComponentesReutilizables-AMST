@@ -190,7 +190,12 @@ void SensorInteligente::enviarPorcentajeBateria(int bateria){
   delay(3000);
 }
 
-
+/**
+* @brief    Realiza la encriptacion a traves de ROT47 donde al leer una cadena de texto, cada
+*           caracter se reemplaza por su ASCII 47 posiciones despues.
+* @param    s: cadena texto cualquiera a la cual se aplicara el algoritmo
+* @return   s: cadena de texto cifrada bajo ROT47 
+*/
 char *SensorInteligente::rot47(char *s)
 {
   char *p = s;

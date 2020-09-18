@@ -24,12 +24,24 @@ public class ROT47 {
         String decrypText = "";
         int key = 47;
         StringBuilder output = new StringBuilder("");
+        
+        /**Cambio de HEX  String: Se parsea cada dos caracteres substring(i, i+2) de la cadena 
+         * en hexadecimal recibida para anexarla 
+         * a una cadena la cual contendra los caracteres correspondientes a dichos valores
+         * en hexadecimal.
+        */
 
         for (int i = 0; i < hexadecimal.length(); i+=2){
             String str = hexadecimal.substring(i, i + 2);
             output.append((char) Integer.parseInt(str, 16));
         }
         String message = output.toString();
+
+        /**
+         * Se lee la cadena obtenida de la conversion de hexadecimal hacia String tomando en cuenta
+         * que los caracteres en ASCII empiezan desde 33 hasta el 126 por lo que se aumenta el valor 
+         * de dicho caracter para cambiarlo.
+         */
 
         for (int i = 0; i < message.length(); i++) {
             int temp = (int) message.charAt(i) - key;
