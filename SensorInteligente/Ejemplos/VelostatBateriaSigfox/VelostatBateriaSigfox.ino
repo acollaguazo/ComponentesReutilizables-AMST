@@ -1,10 +1,11 @@
-/*
-// @file    VelostatBateria.ino
-// @brief   Archivo de ejemplo que puede ser utilizado para captura/envío del
-//          voltaje de un sensor de peso y del porcentaje de una batería 
-//          al Backend de Sigfox, haciendo uso de comandos AT.
+/**
+ * @file    VelostatBateriaSigfox.ino
+ * @brief   Archivo de ejemplo que puede ser utilizado para captura/envío del
+ *          voltaje de un sensor de peso y del porcentaje de una batería 
+ *          al Backend de Sigfox, haciendo uso de la librería ISigfox.
+ */
 
-#include "SensorInteligente.h"
+#include <SensorInteligente.h>
 #include <WISOL.h>
 #include <Isigfox.h>
 
@@ -28,17 +29,14 @@ void loop() {
   Serial.print("PRUEBA ");
   Serial.println(contador++);
   Serial.print(" 1 Porcentaje de bateria = ");
-  int bateria = 81;
+  int bateria = sensores.leerPorcentajeBateria();;
   Serial.print(bateria);
   Serial.println("%");
   Serial.print(" 2 Voltaje del velostat = ");
-  float voltaje = 1.751;
+  float voltaje = sensores.leerVoltajeVelostat();
   Serial.println(voltaje);
-  //sensores.leerVoltajeVelostat();
   uint8_t byteBateria = (uint8_t)bateria;
-  // Serial.println("");
   byte *float_velostat = (byte *)&voltaje;
-  //byte *float_bateria = (byte *)&bateria;
   const uint8_t payloadSize = 5;
   uint8_t bufferDatos[payloadSize];
   bufferDatos[0] = float_velostat[0];
@@ -50,20 +48,18 @@ void loop() {
   uint8_t *sendData = bufferDatos;
   for (int i = 0; i < sizeof(bufferDatos); i++) {
     char cad[2];
-    //cad[2] = imprimirEnHex(bufferDatos[i]);
     sprintf(cad, "%02x", bufferDatos[i]);
     strcat(cadena, cad);
   }
-  Serial.println(millis());
   Serial.print(" Cadena: "); 
   Serial.println(cadena);
   char * enviar = sensores.rot47(cadena);
   Serial.println(enviar);
-  /*La cadena enviar no se puede enviar por lo que contiene caracteres especiales que no son aceptados 
-  * por el backend de Sigfox por lo que se hace un casting hacia uint8_t para almacenar los caracteres
-  * de la cadena como bytes uint8_t *c = (uint8_t *)cadena, para alli recorrer el buffer, concatenar en
-  * cadenaEnviar y enviar mediante comandos AT.
-  * /
+  /* La cadena enviar no se puede enviar directamente usando comandos AT ya que contiene caracteres especiales 
+   * no aceptados por el backend de Sigfox por lo que se hace un casting hacia uint8_t para almacenar los 
+   * caracteres de la cadena como bytes uint8_t *c = (uint8_t *)cadena, para alli recorrer el buffer,
+   * concatenar en cadenaEnviar y enviar mediante comandos AT.
+  */
   uint8_t *c = (uint8_t *)cadena;
   const uint8_t payload = 10;
   uint8_t newBuffer[payload];
@@ -78,10 +74,8 @@ void loop() {
   newBuffer[8]= c[8];
   newBuffer[9]= c[9];
   Send_Pload(newBuffer, 10);
- 
   memset(enviar, '\0', strlen(enviar));
   memset(cadena, '\0', strlen(cadena));
-
   delay(3000);
 }
 
@@ -95,18 +89,3 @@ void Send_Pload(uint8_t *sendData, const uint8_t len){
   Serial.println("");
   free(RecvMsg);
 }
-
-char *rot47(char *s)
-{
-  char *p = s;
-  while(*p) {
-  if(*p >= '!' && *p <= 'O'){
-  *p = ((*p + 47) % 127);
-  }else if(*p >= 'P' && *p <= '~'){
-  *p = ((*p - 47) % 127);
-  }
-  p++;
-  }
-  return s;
-}
-*/

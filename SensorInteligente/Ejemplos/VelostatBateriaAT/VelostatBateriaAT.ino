@@ -1,12 +1,11 @@
-/*
-// @file    VelostatBateria.ino
-// @brief   Archivo de ejemplo que puede ser utilizado para captura/envío del
-//          voltaje de un sensor de peso y del porcentaje de una batería 
-//          al Backend de Sigfox, haciendo uso de comandos AT.
+/**
+ * @file    VelostatBateriaAT.ino
+ * @brief   Archivo de ejemplo que puede ser utilizado para captura/envío del
+ *          voltaje de un sensor de peso y del porcentaje de una batería
+ *          al Backend de Sigfox, haciendo uso de comandos AT.
+ */                
 
-#include "SensorInteligente.h"
-#include <WISOL.h>
-#include <Isigfox.h>
+#include <SensorInteligente.h>
 
 const int pinA0 = A0;
 const int pinA1 = A1;
@@ -30,11 +29,9 @@ void loop() {
   Serial.print(bateria);
   Serial.println("%");
   Serial.print(" 2 Voltaje del velostat = ");
-  float voltaje = sensores.leerVoltajeBateria();
+  float voltaje = sensores.leerVoltajeVelostat();
   Serial.println(voltaje);
-  //sensores.leerVoltajeVelostat();
   uint8_t byteBateria = (uint8_t)bateria;
-  // Serial.println("");
   byte *float_velostat = (byte *)&voltaje;
   const uint8_t payloadSize = 5;
   uint8_t bufferDatos[payloadSize];
@@ -54,16 +51,17 @@ void loop() {
     sprintf(cad, "%02x", bufferDatos[i]);
     strcat(cadena, cad);
   }
-  Serial.println(millis());
   Serial.print(" Cadena: "); 
   Serial.println(cadena);
   char *enviar = sensores.rot47(cadena);
+ 
   /*La cadena enviar no se puede enviar por lo que contiene caracteres especiales que no son aceptados 
   * por el backend de Sigfox por lo que se hace un casting hacia uint8_t para almacenar los caracteres
   * de la cadena como bytes uint8_t *c = (uint8_t *)cadena, para alli recorrer el buffer, concatenar en
   * cadenaEnviar y enviar mediante comandos AT.
-  * /
-  /*
+  */
+  Serial.print(" rot 47: "); 
+  Serial.println(enviar);
   uint8_t *c = (uint8_t *)cadena;
   const uint8_t payload = 10;
   uint8_t newBuffer[payload];
@@ -82,19 +80,13 @@ void loop() {
     char cad1[2];
     sprintf(cad1, "%02x", newBuffer[i]);
     strcat(cadenaEnviar, cad1);
-  }
-  Serial.print(" rot 47: "); 
-  Serial.println(enviar);
-  
-  Serial.println(cadena);
+  }  
   Serial.println("AT$RC");
   delay(100);
   Serial.print("AT$SF=");
   Serial.println(cadenaEnviar);
-  Serial.println(strlen(cadenaEnviar));
   memset(enviar, '\0', strlen(enviar));
   memset(cadena, '\0', strlen(cadena));
   memset(cadenaEnviar, '\0', strlen(cadenaEnviar));
   delay(3000);
 }
-*/

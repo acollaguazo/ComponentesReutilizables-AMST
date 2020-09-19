@@ -55,7 +55,7 @@ void SensorInteligente::inicializar()
 float SensorInteligente::leerVoltajeBateria()
 {
   bateria = analogRead(_pinA1);   
-  delay(2); // permite que se estabilice el convertidor analógico-digital (ADC).
+  delay(2);
   voltajeBateria = (((float) bateria) * 5.0) / 1023.0;
   return voltajeBateria;
 }
@@ -66,15 +66,13 @@ float SensorInteligente::leerVoltajeBateria()
  *          Es necesario que se implemente un divisor de voltaje. 
  *          Establece el voltaje máximo de entrada que entrega la batería en el rango de [0, 1023].
  *          Debe utilizarse en la función setup() luego de inicializar las variables de la librería.
- * @param   rBajo: valor de la resistencia en Ohmios (Ω) que se encuentra conectada al negativo.
- * @param   rArriba: valor de la resistencia en Ohmios Ohmios (Ω) que está conectada al positivo.
+ * @param   rBajo: valor de la resistencia en Ohmios (Ω) que se encuentra conectada al polo negativo.
+ * @param   rArriba: valor de la resistencia en Ohmios Ohmios (Ω) que está conectada al polo positivo.
  * @param   VIn: voltaje de la batería, puede indicar un voltaje nominal o realizar mediciones con un multímetro.
  */
 void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
   float vMax = (rBajo / (rBajo + rArriba)) * vIn;
   _limiteMaximoBateria = (int)(vMax * (1023 / 5));
-  Serial.print("Calibrado! - El valor analogico maximo de bateria es = ");
-  Serial.println(_limiteMaximoBateria);
 }
 
 
@@ -84,7 +82,7 @@ void SensorInteligente::calibrarBateria(float rBajo, float rArriba, float vIn){
  */
 int SensorInteligente::leerPorcentajeBateria(){ 
   bateria = analogRead(_pinA1);    
-  delay(5); // permite que se estabilice el convertidor analógico-digital (ADC).
+  delay(5);
   porcentajeBateria = map((int) bateria, 0, _limiteMaximoBateria, 0, 100);        
   return porcentajeBateria;
 }
@@ -117,11 +115,6 @@ int SensorInteligente::compararNivelBateria(int porcentajeBateria)
     nivelBateriaMayor = porcentajeBateria; 
   }
   return nivelBateriaMayor;
-  
-  /*if ((porcentajeBateria <= nivelBateriaMayor)) {
-    nivelBateriaMayor = porcentajeBateria;
-    return nivelBateriaMayor;
-  }*/
 }
 
 
@@ -129,25 +122,19 @@ int SensorInteligente::compararNivelBateria(int porcentajeBateria)
  * @brief   Función que determina el envío de la batería dado cierto intervalo de tiempo.
  *          La batería solo se envía cuando el nivel es mayor a 30%.
  * @param   intervalo: tiempo de espera para realizar el envío del valor de la batería.
- * @param   porcentaje: 
+ * @param   porcentaje: valor entre 0 y 100 que se transforma a un byte para ser enviado.
  */
 void SensorInteligente::enviarBateria(long intervalo, int porcentaje) 
 {
   int bateria = SensorInteligente::compararNivelBateria(porcentaje); 
-  Serial.print("Bateria: ");
-  Serial.print(bateria);
-  Serial.print(" - Porcentaje bateria: ");
-  Serial.println(porcentaje);
-  //if (millis() - _tiempoAnterior > intervalo) {
+  if (millis() - _tiempoAnterior > intervalo) {
     _tiempoAnterior = millis();
     if(bateria > 30){
-      //Serial.println(_tiempoAnterior);
-      //Serial.println(millis());
       SensorInteligente::enviarPorcentajeBateria(bateria);
     }else{
       Serial.println(" -> Bateria baja");
     }
-  //}
+  }
 }
 
 
@@ -208,17 +195,4 @@ char *SensorInteligente::rot47(char *s)
     p++;
   }
   return s;
-}
-
-
-/**
- * @brief   Función que envía un buffer a Sigfox en el intervalo asignado
- */
-void SensorInteligente::tiempoEspera(long intervalo, float voltajeSensor, float porcentajeBateria, void (*funcionEnvio)(float, float)) 
-{
-  long tiempoA = millis();  
-  if (millis() - _tiempoAnterior > intervalo) {
-    _tiempoAnterior = millis();
-    funcionEnvio(voltajeSensor, porcentajeBateria);
-  }
 }

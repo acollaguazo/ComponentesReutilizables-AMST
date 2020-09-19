@@ -1,9 +1,10 @@
-
-// @file    Bateria.ino
-// @brief   Archivo de ejemplo que puede ser utilizado para la captura/envío del
-//          porcentaje de una batería al Backend de Sigfox, mediante comandos AT.
+/**
+ * @file    Bateria.ino
+ * @brief   Archivo de ejemplo que puede ser utilizado para la captura/envío del
+ *          porcentaje de una batería al Backend de Sigfox, mediante comandos AT.
+ */
  
-#include "SensorInteligente.h"
+#include <SensorInteligente.h>
 
 const int pinA1 = A1;
 int contador = 1;

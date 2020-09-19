@@ -19,7 +19,6 @@ class SensorInteligente
     
     // Funciones
     void inicializar();
-    void tiempoEspera(long intervalo, float voltajeSensor, float porcentajeBateria, void (*funcionEnvio)(float, float));
     void calibrarBateria(float rBajo, float rArriba, float vIn);
     void enviarBateria(long intervalo, int porcentajeBateria);    
     void enviarPorcentajeBateria(int porcentaje);
